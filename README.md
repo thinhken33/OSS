@@ -291,3 +291,23 @@ Quản trị viên có thể:
 ## 9. 🧩 Kết luận
 
 Dự án Web App Quản Lý Công Việc Cá Nhân cung cấp đầy đủ các chức năng cần thiết để người dùng quản lý công việc hiệu quả: từ tạo tài khoản, quản lý công việc, nhắc hạn, thống kê đến quản trị hệ thống. Kiến trúc React + Node.js + Express + PostgreSQL đảm bảo tính linh hoạt, dễ mở rộng và phù hợp cho quá trình phát triển thực tế.
+
+## 10. 📄 Giấy phép
+
+Dự án này được phát hành theo giấy phép **MIT License**.
+
+Bạn được phép:
+
+- Sử dụng cho mục đích cá nhân hoặc thương mại
+- Sao chép, chỉnh sửa, hợp nhất, phát hành và phân phối lại mã nguồn
+- Cấp phép lại hoặc bán phần mềm
+
+Điều kiện bắt buộc:
+
+- Phải giữ nguyên thông báo bản quyền và thông báo giấy phép MIT trong mọi bản sao hoặc phần quan trọng của phần mềm
+
+Miễn trừ trách nhiệm:
+
+- Phần mềm được cung cấp "as is", không có bất kỳ bảo đảm nào
+
+Xem toàn văn giấy phép tại [LICENSE](LICENSE).
