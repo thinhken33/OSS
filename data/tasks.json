@@ -1,0 +1,29 @@
+[
+  {
+    "id": "101",
+    "title": "Buổi 2",
+    "description": "Hoàn thành phần giao diện trang danh sách công việc và kiểm tra hiển thị trên mobile.",
+    "status": "in-progress",
+    "priority": "medium",
+    "dueDate": "2026-04-15",
+    "createdAt": "2026-04-15T06:00:00.000Z"
+  },
+  {
+    "id": "102",
+    "title": "Buổi 1",
+    "description": "Nộp báo cáo phần phân tích chức năng nhưng đã trễ hạn, cần cập nhật lại tiến độ.",
+    "status": "not-started",
+    "priority": "medium",
+    "dueDate": "2026-03-27",
+    "createdAt": "2026-04-15T06:00:00.000Z"
+  },
+  {
+    "id": "103",
+    "title": "deadline Thầy Định",
+    "description": "Chuẩn bị source code, báo cáo và slide để nộp đúng hạn.",
+    "status": "not-started",
+    "priority": "high",
+    "dueDate": "2026-04-30",
+    "createdAt": "2026-04-15T06:00:00.000Z"
+  }
+]

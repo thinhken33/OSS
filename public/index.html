@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý công việc</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="title-wrap">
+        <h1>Công việc</h1>
+        <div class="stats">
+          <span id="stat-total">0 tổng</span>
+          <span id="stat-not-started">0 chưa bắt đầu</span>
+          <span id="stat-in-progress">0 đang làm</span>
+          <span id="stat-completed">0 xong</span>
+          <span id="stat-overdue" class="danger">0 quá hạn</span>
+        </div>
+      </div>
+
+      <div class="user-tools">
+        <button class="icon-btn" type="button">🔔<span class="badge-dot">2</span></button>
+        <button class="icon-btn" type="button">📊</button>
+        <button class="icon-btn" type="button">⚙️</button>
+        <div class="avatar">K</div>
+        <span class="user-name">ken</span>
+      </div>
+    </header>
+
+    <div class="action-bar">
+      <button class="add-btn" id="openAddModal" type="button">
+        <span>＋</span>
+        <span>Thêm công việc</span>
+      </button>
+    </div>
+
+    <section class="toolbar">
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="searchInput" placeholder="Tìm kiếm công việc..." />
+      </div>
+
+      <button class="filter-btn" id="toggleFilterBtn" type="button">
+        <span>☷</span>
+        <span>Bộ lọc</span>
+      </button>
+    </section>
+
+    <section class="filter-panel" id="filterPanel">
+      <div class="field">
+        <label for="statusFilter">Trạng thái</label>
+        <select id="statusFilter">
+          <option value="all">Tất cả</option>
+          <option value="not-started">Chưa bắt đầu</option>
+          <option value="in-progress">Đang làm</option>
+          <option value="completed">Hoàn thành</option>
+          <option value="overdue">Quá hạn</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="priorityFilter">Mức độ ưu tiên</label>
+        <select id="priorityFilter">
+          <option value="all">Tất cả</option>
+          <option value="low">Thấp</option>
+          <option value="medium">Trung bình</option>
+          <option value="high">Cao</option>
+        </select>
+      </div>
+
+      <div class="field field-btn">
+        <button id="resetFilterBtn" type="button">Đặt lại bộ lọc</button>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="all" type="button">Tất cả (<span>0</span>)</button>
+      <button class="tab" data-tab="not-started" type="button">Chưa bắt đầu (<span>0</span>)</button>
+      <button class="tab" data-tab="in-progress" type="button">Đang làm (<span>0</span>)</button>
+      <button class="tab" data-tab="completed" type="button">Hoàn thành (<span>0</span>)</button>
+      <button class="tab" data-tab="overdue" type="button">Quá hạn (<span>0</span>)</button>
+    </nav>
+
+    <section class="list" id="taskList"></section>
+
+    <div class="empty-state" id="emptyState">
+      Không có công việc nào phù hợp.
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modalTitle">Thêm công việc</h2>
+        <button class="close-btn" id="closeModal" type="button">&times;</button>
+      </div>
+
+      <form id="taskForm">
+        <input type="hidden" id="taskId" />
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="taskTitle">Tên công việc</label>
+            <input type="text" id="taskTitle" placeholder="Nhập tên công việc" required />
+          </div>
+
+          <div class="form-group">
+            <label for="taskDescription">Mô tả</label>
+            <textarea id="taskDescription" placeholder="Nhập mô tả công việc"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="taskStatus">Trạng thái</label>
+              <select id="taskStatus">
+                <option value="not-started">Chưa bắt đầu</option>
+                <option value="in-progress">Đang làm</option>
+                <option value="completed">Hoàn thành</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="taskPriority">Mức ưu tiên</label>
+              <select id="taskPriority">
+                <option value="low">Thấp</option>
+                <option value="medium">Trung bình</option>
+                <option value="high">Cao</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="taskDueDate">Hạn công việc</label>
+            <input type="date" id="taskDueDate" required />
+          </div>
+        </div>
+
+        <div class="modal-foot">
+          <button class="btn-secondary" id="cancelModal" type="button">Huỷ</button>
+          <button class="btn-primary" type="submit">Lưu công việc</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
