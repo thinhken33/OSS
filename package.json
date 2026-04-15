@@ -1,0 +1,12 @@
+{
+  "name": "task-manager-express-mvc",
+  "version": "1.0.0",
+  "description": "Task manager with Express MVC",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
