@@ -3,10 +3,28 @@ const taskController = require("../controllers/taskController");
 
 const router = express.Router();
 
-router.get("/", taskController.getAllTasks);
+// Lấy tất cả tasks của user
+router.get("/user/:userId", taskController.getTasks);
+
+// Tìm kiếm & lọc tasks
+router.get("/user/:userId/search", taskController.searchTasks);
+
+// Lấy thống kê tasks
+router.get("/user/:userId/stats", taskController.getTaskStats);
+
+// Lấy task theo ID
 router.get("/:id", taskController.getTaskById);
-router.post("/", taskController.createTask);
-router.put("/:id", taskController.updateTask);
-router.delete("/:id", taskController.deleteTask);
+
+// Tạo task mới
+router.post("/user/:userId", taskController.createTask);
+
+// Cập nhật task
+router.put("/:id/user/:userId", taskController.updateTask);
+
+// Cập nhật trạng thái task
+router.patch("/:id/user/:userId/status", taskController.updateTaskStatus);
+
+// Xóa task
+router.delete("/:id/user/:userId", taskController.deleteTask);
 
 module.exports = router;

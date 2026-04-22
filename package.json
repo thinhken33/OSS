@@ -1,12 +1,16 @@
 {
   "name": "task-manager-express-mvc",
   "version": "1.0.0",
-  "description": "Task manager with Express MVC",
+  "description": "Task manager with Express MVC and PostgreSQL",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1",
+    "pg": "^8.13.1"
   }
 }
