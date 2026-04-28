@@ -1,5 +1,5 @@
-const thongBaoModel = require("../models/notificationModel");
-const congViecModel = require("../models/taskModel");
+const thongBaoModel = require("../models/thongBaoModel");
+const congViecModel = require("../models/congViecModel");
 
 function taoLoi(thongBao, maLoi) {
   const loi = new Error(thongBao);

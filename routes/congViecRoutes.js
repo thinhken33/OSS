@@ -1,5 +1,5 @@
 const express = require("express");
-const dieuKhienCongViec = require("../controllers/taskController");
+const dieuKhienCongViec = require("../controllers/congViecController");
 
 const boTuyenDuong = express.Router();
 

@@ -1,4 +1,4 @@
-const danhMucModel = require("../models/categoryModel");
+const danhMucModel = require("../models/danhMucModel");
 
 function taoLoi(thongBao, maLoi) {
   const loi = new Error(thongBao);

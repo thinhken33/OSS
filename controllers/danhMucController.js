@@ -1,4 +1,4 @@
-const danhMucService = require("../services/categoryService");
+const danhMucService = require("../services/danhMucService");
 
 /**
  * Lay tat ca danh muc cua nguoi dung

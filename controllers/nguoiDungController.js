@@ -1,4 +1,4 @@
-const nguoiDungService = require("../services/userService");
+const nguoiDungService = require("../services/nguoiDungService");
 
 /**
  * Lay danh sach tat ca nguoi dung (Admin)

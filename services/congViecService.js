@@ -1,4 +1,4 @@
-const congViecModel = require("../models/taskModel");
+const congViecModel = require("../models/congViecModel");
 
 function taoLoi(thongBao, maLoi) {
   const loi = new Error(thongBao);

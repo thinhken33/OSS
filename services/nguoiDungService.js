@@ -1,4 +1,4 @@
-const nguoiDungModel = require("../models/userModel");
+const nguoiDungModel = require("../models/nguoiDungModel");
 const bcrypt = require("bcryptjs");
 
 const SO_VONG_MA_HOA = 10;

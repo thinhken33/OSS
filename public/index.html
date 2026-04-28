@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quan ly cong viec ca nhan</title>
-  <meta name="description" content="Ung dung web quan ly cong viec ca nhan - theo doi tien do, nhac han, thong ke hieu qua" />
+  <title>Quản lý công việc cá nhân</title>
+  <meta name="description" content="Ứng dụng web quản lý công việc cá nhân - theo dõi tiến độ, nhắc hạn, thống kê hiệu quả" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -14,8 +14,8 @@
     <div class="auth-card">
       <div class="auth-header">
         <div class="auth-logo">📋</div>
-        <h1>Dang nhap</h1>
-        <p>Quan ly cong viec ca nhan hieu qua</p>
+        <h1>Đăng nhập</h1>
+        <p>Quản lý công việc cá nhân hieu qua</p>
       </div>
       <form id="formDangNhap" class="auth-form">
         <div class="form-group">
@@ -23,13 +23,13 @@
           <input type="email" id="dnEmail" placeholder="email@example.com" required />
         </div>
         <div class="form-group">
-          <label for="dnMatKhau">Mat khau</label>
-          <input type="password" id="dnMatKhau" placeholder="Nhap mat khau" required />
+          <label for="dnMatKhau">Mật khẩu</label>
+          <input type="password" id="dnMatKhau" placeholder="Nhập mật khẩu" required />
         </div>
         <div id="loiDangNhap" class="error-msg"></div>
-        <button type="submit" class="btn-primary btn-full">Dang nhap</button>
+        <button type="submit" class="btn-primary btn-full">Đăng nhập</button>
       </form>
-      <p class="auth-switch">Chua co tai khoan? <a href="#" id="nutMoDangKy">Dang ky ngay</a></p>
+      <p class="auth-switch">Chưa có tài khoản? <a href="#" id="nutMoDangKy">Đăng ký ngay</a></p>
     </div>
   </div>
 
@@ -38,12 +38,12 @@
     <div class="auth-card">
       <div class="auth-header">
         <div class="auth-logo">📋</div>
-        <h1>Dang ky</h1>
-        <p>Tao tai khoan moi</p>
+        <h1>Đăng ký</h1>
+        <p>Tạo tài khoản mới</p>
       </div>
       <form id="formDangKy" class="auth-form">
         <div class="form-group">
-          <label for="dkHoTen">Ho va ten</label>
+          <label for="dkHoTen">Họ và tên</label>
           <input type="text" id="dkHoTen" placeholder="Nguyen Van A" required />
         </div>
         <div class="form-group">
@@ -51,17 +51,17 @@
           <input type="email" id="dkEmail" placeholder="email@example.com" required />
         </div>
         <div class="form-group">
-          <label for="dkMatKhau">Mat khau</label>
-          <input type="password" id="dkMatKhau" placeholder="It nhat 6 ky tu" required minlength="6" />
+          <label for="dkMatKhau">Mật khẩu</label>
+          <input type="password" id="dkMatKhau" placeholder="Ít nhất 6 ký tự" required minlength="6" />
         </div>
         <div class="form-group">
-          <label for="dkXacNhan">Xac nhan mat khau</label>
-          <input type="password" id="dkXacNhan" placeholder="Nhap lai mat khau" required />
+          <label for="dkXacNhan">Xác nhận mật khẩu</label>
+          <input type="password" id="dkXacNhan" placeholder="Nhập lại mật khẩu" required />
         </div>
         <div id="loiDangKy" class="error-msg"></div>
-        <button type="submit" class="btn-primary btn-full">Dang ky</button>
+        <button type="submit" class="btn-primary btn-full">Đăng ký</button>
       </form>
-      <p class="auth-switch">Da co tai khoan? <a href="#" id="nutMoDangNhap">Dang nhap</a></p>
+      <p class="auth-switch">Đã có tài khoản? <a href="#" id="nutMoDangNhap">Đăng nhập</a></p>
     </div>
   </div>
 
@@ -76,12 +76,12 @@
       </div>
 
       <ul class="sidebar-menu">
-        <li><button class="menu-item active" data-page="congViec" type="button">📝 Cong viec</button></li>
-        <li><button class="menu-item" data-page="danhMuc" type="button">🗂️ Danh muc</button></li>
-        <li><button class="menu-item" data-page="thongBao" type="button">🔔 Thong bao <span id="badgeThongBao" class="menu-badge" style="display:none;">0</span></button></li>
-        <li><button class="menu-item" data-page="thongKe" type="button">📊 Thong ke</button></li>
-        <li><button class="menu-item" data-page="caNhan" type="button">👤 Ca nhan</button></li>
-        <li id="menuAdmin" style="display:none;"><button class="menu-item" data-page="quanTri" type="button">🛡️ Quan tri</button></li>
+        <li><button class="menu-item active" data-page="congViec" type="button">📝 Công việc</button></li>
+        <li><button class="menu-item" data-page="danhMuc" type="button">🗂️ Danh mục</button></li>
+        <li><button class="menu-item" data-page="thongBao" type="button">🔔 Thông báo <span id="badgeThongBao" class="menu-badge" style="display:none;">0</span></button></li>
+        <li><button class="menu-item" data-page="thongKe" type="button">📊 Thống kê</button></li>
+        <li><button class="menu-item" data-page="caNhan" type="button">👤 Cá nhân</button></li>
+        <li id="menuAdmin" style="display:none;"><button class="menu-item" data-page="quanTri" type="button">🛡️ Quản trị</button></li>
       </ul>
 
       <div class="sidebar-footer">
@@ -89,7 +89,7 @@
           <div class="avatar-sm" id="avatarSidebar">K</div>
           <span id="tenNguoiDungSidebar">User</span>
         </div>
-        <button class="btn-logout" id="nutDangXuat" type="button">Dang xuat</button>
+        <button class="btn-logout" id="nutDangXuat" type="button">Đăng xuất</button>
       </div>
     </nav>
 
@@ -100,85 +100,85 @@
       <section id="pageCongViec" class="page">
         <div class="page-header">
           <div>
-            <h1>Cong viec cua toi</h1>
+            <h1>Công việc của tôi</h1>
             <div class="stats" id="thongKeCongViec">
-              <span id="stat-total">0 tong</span>
-              <span id="stat-not-started">0 chua bat dau</span>
-              <span id="stat-in-progress">0 dang lam</span>
+              <span id="stat-total">0 tổng</span>
+              <span id="stat-not-started">0 chưa bắt đầu</span>
+              <span id="stat-in-progress">0 đang làm</span>
               <span id="stat-completed">0 xong</span>
-              <span id="stat-overdue" class="danger">0 qua han</span>
+              <span id="stat-overdue" class="danger">0 quá hạn</span>
             </div>
           </div>
           <button class="add-btn" id="openAddModal" type="button">
             <span>＋</span>
-            <span>Them cong viec</span>
+            <span>Thêm công việc</span>
           </button>
         </div>
 
         <section class="toolbar">
           <div class="search-box">
             <span class="search-icon">⌕</span>
-            <input type="text" id="searchInput" placeholder="Tim kiem cong viec..." />
+            <input type="text" id="searchInput" placeholder="Tìm kiếm công việc..." />
           </div>
           <button class="filter-btn" id="toggleFilterBtn" type="button">
             <span>☷</span>
-            <span>Bo loc</span>
+            <span>Bộ lọc</span>
           </button>
         </section>
 
         <section class="filter-panel" id="filterPanel">
           <div class="field">
-            <label for="statusFilter">Trang thai</label>
+            <label for="statusFilter">Trạng thái</label>
             <select id="statusFilter">
-              <option value="all">Tat ca</option>
-              <option value="not-started">Chua bat dau</option>
-              <option value="in-progress">Dang lam</option>
-              <option value="completed">Hoan thanh</option>
-              <option value="overdue">Qua han</option>
+              <option value="all">Tất cả</option>
+              <option value="not-started">Chưa bắt đầu</option>
+              <option value="in-progress">Đang làm</option>
+              <option value="completed">Hoàn thành</option>
+              <option value="overdue">Quá hạn</option>
             </select>
           </div>
           <div class="field">
-            <label for="priorityFilter">Muc do uu tien</label>
+            <label for="priorityFilter">Mức độ ưu tiên</label>
             <select id="priorityFilter">
-              <option value="all">Tat ca</option>
-              <option value="low">Thap</option>
-              <option value="medium">Trung binh</option>
+              <option value="all">Tất cả</option>
+              <option value="low">Thấp</option>
+              <option value="medium">Trung bình</option>
               <option value="high">Cao</option>
             </select>
           </div>
           <div class="field field-btn">
-            <button id="resetFilterBtn" type="button">Dat lai bo loc</button>
+            <button id="resetFilterBtn" type="button">Đặt lại bộ lọc</button>
           </div>
         </section>
 
         <nav class="tabs">
-          <button class="tab active" data-tab="all" type="button">Tat ca (<span>0</span>)</button>
-          <button class="tab" data-tab="not-started" type="button">Chua bat dau (<span>0</span>)</button>
-          <button class="tab" data-tab="in-progress" type="button">Dang lam (<span>0</span>)</button>
-          <button class="tab" data-tab="completed" type="button">Hoan thanh (<span>0</span>)</button>
-          <button class="tab" data-tab="overdue" type="button">Qua han (<span>0</span>)</button>
+          <button class="tab active" data-tab="all" type="button">Tất cả (<span>0</span>)</button>
+          <button class="tab" data-tab="not-started" type="button">Chưa bắt đầu (<span>0</span>)</button>
+          <button class="tab" data-tab="in-progress" type="button">Đang làm (<span>0</span>)</button>
+          <button class="tab" data-tab="completed" type="button">Hoàn thành (<span>0</span>)</button>
+          <button class="tab" data-tab="overdue" type="button">Quá hạn (<span>0</span>)</button>
         </nav>
 
         <section class="list" id="taskList"></section>
-        <div class="empty-state" id="emptyState">Khong co cong viec nao phu hop.</div>
+        <div class="empty-state" id="emptyState">Không có công việc nào phù hợp.</div>
       </section>
 
       <!-- ===== TRANG DANH MUC ===== -->
       <section id="pageDanhMuc" class="page" style="display:none;">
         <div class="page-header">
-          <h1>Danh muc cong viec</h1>
+          <h1>Danh mục công việc</h1>
           <button class="add-btn" id="nutThemDanhMuc" type="button">
             <span>＋</span>
-            <span>Them danh muc</span>
+            <span>Thêm danh mục</span>
           </button>
         </div>
         <div class="dm-form-wrap" id="formThemDanhMuc" style="display:none;">
-          <input type="text" id="tenDanhMucMoi" placeholder="Nhap ten danh muc..." class="dm-input" />
-          <button class="btn-primary" id="nutLuuDanhMuc" type="button">Luu</button>
-          <button class="btn-secondary" id="nutHuyDanhMuc" type="button">Huy</button>
+          <input type="text" id="tenDanhMucMoi" placeholder="Nhập tên danh mục..." class="dm-input" />
+          <button class="btn-primary" id="nutLưuDanhMuc" type="button">Lưu</button>
+          <button class="btn-secondary" id="nutHủyDanhMuc" type="button">Hủy</button>
         </div>
         <div class="dm-list" id="danhSachDanhMuc"></div>
-        <div class="empty-state show" id="rongDanhMuc">Chua co danh muc nao. Hay tao danh muc dau tien!</div>
+        <div class="empty-state show" id="rongDanhMuc">Chưa có danh mục nào. Hãy tạo danh mục đầu tiên!</div>
       </section>
 
       <!-- ===== TRANG THONG BAO ===== -->
@@ -186,47 +186,47 @@
         <div class="page-header">
           <h1>Thong bao</h1>
           <div class="page-actions">
-            <button class="btn-secondary" id="nutDocTatCa" type="button">Danh dau tat ca da doc</button>
-            <button class="btn-primary" id="nutTaoNhacViec" type="button">🔔 Tao nhac viec</button>
+            <button class="btn-secondary" id="nutDocTatCa" type="button">Đánh dấu tất cả đã đọc</button>
+            <button class="btn-primary" id="nutTaoNhacViec" type="button">🔔 Tạo nhắc việc</button>
           </div>
         </div>
         <div class="tb-list" id="danhSachThongBao"></div>
-        <div class="empty-state show" id="rongThongBao">Khong co thong bao moi.</div>
+        <div class="empty-state show" id="rongThongBao">Không có thông báo mới.</div>
       </section>
 
       <!-- ===== TRANG THONG KE ===== -->
       <section id="pageThongKe" class="page" style="display:none;">
         <div class="page-header">
-          <h1>Thong ke cong viec</h1>
+          <h1>Thống kê công việc</h1>
         </div>
         <div class="stats-grid">
           <div class="stat-card stat-total">
             <div class="stat-number" id="tkTong">0</div>
-            <div class="stat-label">Tong cong viec</div>
+            <div class="stat-label">Tổng công việc</div>
           </div>
           <div class="stat-card stat-pending">
             <div class="stat-number" id="tkChuaBatDau">0</div>
-            <div class="stat-label">Chua bat dau</div>
+            <div class="stat-label">Chưa bắt đầu</div>
           </div>
           <div class="stat-card stat-progress">
             <div class="stat-number" id="tkDangLam">0</div>
-            <div class="stat-label">Dang lam</div>
+            <div class="stat-label">Đang làm</div>
           </div>
           <div class="stat-card stat-done">
             <div class="stat-number" id="tkHoanThanh">0</div>
-            <div class="stat-label">Hoan thanh</div>
+            <div class="stat-label">Hoàn thành</div>
           </div>
           <div class="stat-card stat-overdue">
             <div class="stat-number" id="tkQuaHan">0</div>
-            <div class="stat-label">Qua han</div>
+            <div class="stat-label">Quá hạn</div>
           </div>
           <div class="stat-card stat-rate">
             <div class="stat-number" id="tkTiLe">0%</div>
-            <div class="stat-label">Ti le hoan thanh</div>
+            <div class="stat-label">Tỉ lệ hoàn thành</div>
           </div>
         </div>
         <div class="chart-section">
-          <h2>Bieu do trang thai</h2>
+          <h2>Biểu đồ trạng thái</h2>
           <div class="chart-bars" id="bieuDoThongKe"></div>
         </div>
       </section>
@@ -234,13 +234,13 @@
       <!-- ===== TRANG CA NHAN ===== -->
       <section id="pageCaNhan" class="page" style="display:none;">
         <div class="page-header">
-          <h1>Thong tin ca nhan</h1>
+          <h1>Thông tin cá nhân</h1>
         </div>
         <div class="profile-card">
           <div class="profile-avatar" id="avatarCaNhan">K</div>
           <form id="formCaNhan" class="profile-form">
             <div class="form-group">
-              <label for="cnHoTen">Ho va ten</label>
+              <label for="cnHoTen">Họ và tên</label>
               <input type="text" id="cnHoTen" required />
             </div>
             <div class="form-group">
@@ -248,30 +248,30 @@
               <input type="email" id="cnEmail" disabled />
             </div>
             <div class="form-group">
-              <label for="cnMoTa">Mo ta ban than</label>
-              <textarea id="cnMoTa" rows="3" placeholder="Viet gi do ve ban than..."></textarea>
+              <label for="cnMoTa">Mô tả bản thân</label>
+              <textarea id="cnMoTa" rows="3" placeholder="Viết gì đó về bản thân..."></textarea>
             </div>
             <div id="loiCaNhan" class="error-msg"></div>
-            <button type="submit" class="btn-primary">Luu thay doi</button>
+            <button type="submit" class="btn-primary">Lưu thay doi</button>
           </form>
         </div>
         <div class="profile-card" style="margin-top:20px;">
-          <h2>Doi mat khau</h2>
+          <h2>Đổi mật khẩu</h2>
           <form id="formDoiMatKhau" class="profile-form">
             <div class="form-group">
-              <label for="mkHienTai">Mat khau hien tai</label>
+              <label for="mkHienTai">Mật khẩu hien tai</label>
               <input type="password" id="mkHienTai" required />
             </div>
             <div class="form-group">
-              <label for="mkMoi">Mat khau moi</label>
+              <label for="mkMoi">Mật khẩu moi</label>
               <input type="password" id="mkMoi" required minlength="6" />
             </div>
             <div class="form-group">
-              <label for="mkXacNhan">Xac nhan mat khau moi</label>
+              <label for="mkXacNhan">Xác nhận mật khẩu moi</label>
               <input type="password" id="mkXacNhan" required />
             </div>
             <div id="loiDoiMK" class="error-msg"></div>
-            <button type="submit" class="btn-primary">Doi mat khau</button>
+            <button type="submit" class="btn-primary">Đổi mật khẩu</button>
           </form>
         </div>
       </section>
@@ -279,18 +279,18 @@
       <!-- ===== TRANG QUAN TRI (Admin) ===== -->
       <section id="pageQuanTri" class="page" style="display:none;">
         <div class="page-header">
-          <h1>Quan tri nguoi dung</h1>
+          <h1>Quản trị người dùng</h1>
         </div>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Ho ten</th>
+                <th>Họ tên</th>
                 <th>Email</th>
-                <th>Vai tro</th>
-                <th>Trang thai</th>
-                <th>Thao tac</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
               </tr>
             </thead>
             <tbody id="danhSachNguoiDung"></tbody>
@@ -305,52 +305,52 @@
   <div class="modal-backdrop" id="modalBackdrop">
     <div class="modal">
       <div class="modal-head">
-        <h2 id="modalTitle">Them cong viec</h2>
+        <h2 id="modalTitle">Thêm công việc</h2>
         <button class="close-btn" id="closeModal" type="button">&times;</button>
       </div>
       <form id="taskForm">
         <input type="hidden" id="taskId" />
         <div class="modal-body">
           <div class="form-group">
-            <label for="taskTitle">Ten cong viec</label>
-            <input type="text" id="taskTitle" placeholder="Nhap ten cong viec" required />
+            <label for="taskTitle">Tên công việc</label>
+            <input type="text" id="taskTitle" placeholder="Nhập tên công việc" required />
           </div>
           <div class="form-group">
-            <label for="taskDescription">Mo ta</label>
-            <textarea id="taskDescription" placeholder="Nhap mo ta cong viec"></textarea>
+            <label for="taskDescription">Mô tả</label>
+            <textarea id="taskDescription" placeholder="Nhập mô tả công việc"></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="taskStatus">Trang thai</label>
+              <label for="taskStatus">Trạng thái</label>
               <select id="taskStatus">
-                <option value="not-started">Chua bat dau</option>
-                <option value="in-progress">Dang lam</option>
-                <option value="completed">Hoan thanh</option>
+                <option value="not-started">Chưa bắt đầu</option>
+                <option value="in-progress">Đang làm</option>
+                <option value="completed">Hoàn thành</option>
               </select>
             </div>
             <div class="form-group">
-              <label for="taskPriority">Muc uu tien</label>
+              <label for="taskPriority">Mức ưu tiên</label>
               <select id="taskPriority">
-                <option value="low">Thap</option>
-                <option value="medium">Trung binh</option>
+                <option value="low">Thấp</option>
+                <option value="medium">Trung bình</option>
                 <option value="high">Cao</option>
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label for="taskDueDate">Han cong viec</label>
+            <label for="taskDueDate">Hạn công việc</label>
             <input type="date" id="taskDueDate" required />
           </div>
           <div class="form-group">
             <label for="taskCategory">Danh muc</label>
             <select id="taskCategory">
-              <option value="">-- Khong chon --</option>
+              <option value="">-- Không chọn --</option>
             </select>
           </div>
         </div>
         <div class="modal-foot">
-          <button class="btn-secondary" id="cancelModal" type="button">Huy</button>
-          <button class="btn-primary" type="submit">Luu cong viec</button>
+          <button class="btn-secondary" id="cancelModal" type="button">Hủy</button>
+          <button class="btn-primary" type="submit">Lưu cong viec</button>
         </div>
       </form>
     </div>

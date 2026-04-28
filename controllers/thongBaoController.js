@@ -1,4 +1,4 @@
-const thongBaoService = require("../services/notificationService");
+const thongBaoService = require("../services/thongBaoService");
 
 /**
  * Lay tat ca thong bao cua nguoi dung
