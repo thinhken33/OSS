@@ -1,42 +1,42 @@
-const notificationModel = require("../models/notificationModel");
-const taskModel = require("../models/taskModel");
+const thongBaoModel = require("../models/notificationModel");
+const congViecModel = require("../models/taskModel");
 
-function createError(message, statusCode) {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
+function taoLoi(thongBao, maLoi) {
+  const loi = new Error(thongBao);
+  loi.statusCode = maLoi;
+  return loi;
 }
 
 /**
- * Lấy tất cả thông báo của user
+ * Lay tat ca thong bao cua nguoi dung
  */
-async function getNotificationsByUserId(userId) {
-  return await notificationModel.getNotificationsByUserId(userId);
+async function layThongBaoTheoNguoiDung(maNguoiDung) {
+  return await thongBaoModel.layThongBaoTheoNguoiDung(maNguoiDung);
 }
 
 /**
- * Lấy thông báo chưa đọc
+ * Lay thong bao chua doc
  */
-async function getUnreadNotifications(userId) {
-  return await notificationModel.getUnreadNotifications(userId);
+async function layThongBaoChuaDoc(maNguoiDung) {
+  return await thongBaoModel.layThongBaoChuaDoc(maNguoiDung);
 }
 
 /**
- * Đếm thông báo chưa đọc
+ * Dem thong bao chua doc
  */
-async function countUnreadNotifications(userId) {
-  return await notificationModel.countUnreadNotifications(userId);
+async function demThongBaoChuaDoc(maNguoiDung) {
+  return await thongBaoModel.demThongBaoChuaDoc(maNguoiDung);
 }
 
 /**
- * Tạo thông báo mới
+ * Tao thong bao moi
  */
-async function createNotification({ user_id, task_id, message }) {
+async function taoThongBao({ user_id, task_id, message }) {
   if (!message || !message.trim()) {
-    throw createError("Nội dung thông báo không được để trống.", 400);
+    throw taoLoi("Noi dung thong bao khong duoc de trong.", 400);
   }
 
-  return await notificationModel.createNotification({
+  return await thongBaoModel.taoThongBao({
     user_id,
     task_id: task_id || null,
     message: message.trim(),
@@ -44,81 +44,81 @@ async function createNotification({ user_id, task_id, message }) {
 }
 
 /**
- * Đánh dấu đã đọc một thông báo
+ * Danh dau da doc mot thong bao
  */
-async function markAsRead(id, userId) {
-  const notification = await notificationModel.getNotificationById(id);
-  if (!notification) {
-    throw createError("Không tìm thấy thông báo.", 404);
+async function danhDauDaDoc(maThongBao, maNguoiDung) {
+  const thongBaoHienTai = await thongBaoModel.layThongBaoTheoId(maThongBao);
+  if (!thongBaoHienTai) {
+    throw taoLoi("Khong tim thay thong bao.", 404);
   }
 
-  if (notification.user_id !== userId) {
-    throw createError("Bạn không có quyền thao tác thông báo này.", 403);
+  if (thongBaoHienTai.user_id !== maNguoiDung) {
+    throw taoLoi("Ban khong co quyen thao tac thong bao nay.", 403);
   }
 
-  return await notificationModel.markAsRead(id);
+  return await thongBaoModel.danhDauDaDoc(maThongBao);
 }
 
 /**
- * Đánh dấu tất cả là đã đọc
+ * Danh dau tat ca la da doc
  */
-async function markAllAsRead(userId) {
-  return await notificationModel.markAllAsRead(userId);
+async function danhDauTatCaDaDoc(maNguoiDung) {
+  return await thongBaoModel.danhDauTatCaDaDoc(maNguoiDung);
 }
 
 /**
- * Xóa thông báo
+ * Xoa thong bao
  */
-async function deleteNotification(id, userId) {
-  const notification = await notificationModel.getNotificationById(id);
-  if (!notification) {
-    throw createError("Không tìm thấy thông báo để xóa.", 404);
+async function xoaThongBao(maThongBao, maNguoiDung) {
+  const thongBaoHienTai = await thongBaoModel.layThongBaoTheoId(maThongBao);
+  if (!thongBaoHienTai) {
+    throw taoLoi("Khong tim thay thong bao de xoa.", 404);
   }
 
-  if (notification.user_id !== userId) {
-    throw createError("Bạn không có quyền xóa thông báo này.", 403);
+  if (thongBaoHienTai.user_id !== maNguoiDung) {
+    throw taoLoi("Ban khong co quyen xoa thong bao nay.", 403);
   }
 
-  await notificationModel.deleteNotification(id);
-  return notification;
+  await thongBaoModel.xoaThongBao(maThongBao);
+  return thongBaoHienTai;
 }
 
 /**
- * Tạo thông báo nhắc việc cho tasks sắp hạn / quá hạn
+ * Tao thong bao nhac viec cho cong viec sap han / qua han
  */
-async function generateTaskReminders(userId) {
-  const tasks = await taskModel.getOverdueAndUpcomingTasks(userId);
-  const notifications = [];
+async function taoThongBaoNhacViec(maNguoiDung) {
+  const danhSachCongViec = await congViecModel.layCongViecQuaHanVaSapDenHan(maNguoiDung);
+  const danhSachThongBao = [];
 
-  for (const task of tasks) {
-    const now = new Date();
-    const dueDate = new Date(task.due_date);
-    let message;
+  for (const congViec of danhSachCongViec) {
+    const bayGio = new Date();
+    const hanHoanThanh = new Date(congViec.due_date);
+    let noiDung;
 
-    if (dueDate < now) {
-      message = `Công việc "${task.title}" đã quá hạn!`;
+    if (hanHoanThanh < bayGio) {
+      noiDung = `Cong viec "${congViec.title}" da qua han!`;
     } else {
-      message = `Công việc "${task.title}" sắp đến hạn (${dueDate.toLocaleDateString("vi-VN")}).`;
+      noiDung = `Cong viec "${congViec.title}" sap den han (${hanHoanThanh.toLocaleDateString("vi-VN")}).`;
     }
 
-    const notification = await notificationModel.createNotification({
-      user_id: userId,
-      task_id: task.task_id,
-      message,
+    const thongBaoMoi = await thongBaoModel.taoThongBao({
+      user_id: maNguoiDung,
+      task_id: congViec.task_id,
+      message: noiDung,
     });
-    notifications.push(notification);
+    danhSachThongBao.push(thongBaoMoi);
   }
 
-  return notifications;
+  return danhSachThongBao;
 }
 
 module.exports = {
-  getNotificationsByUserId,
-  getUnreadNotifications,
-  countUnreadNotifications,
-  createNotification,
-  markAsRead,
-  markAllAsRead,
-  deleteNotification,
-  generateTaskReminders,
+  layThongBaoTheoNguoiDung,
+  layThongBaoChuaDoc,
+  demThongBaoChuaDoc,
+  taoThongBao,
+  danhDauDaDoc,
+  danhDauTatCaDaDoc,
+  xoaThongBao,
+  taoThongBaoNhacViec,
 };

@@ -1,138 +1,138 @@
-const notificationService = require("../services/notificationService");
+const thongBaoService = require("../services/notificationService");
 
 /**
- * Lấy tất cả thông báo của user
+ * Lay tat ca thong bao cua nguoi dung
  */
-async function getNotifications(req, res) {
+async function layThongBao(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const notifications = await notificationService.getNotificationsByUserId(userId);
-    res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: error.message || "Không lấy được thông báo." });
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhSachThongBao = await thongBaoService.layThongBaoTheoNguoiDung(maNguoiDung);
+    phanHoi.json(danhSachThongBao);
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message || "Khong lay duoc thong bao." });
   }
 }
 
 /**
- * Lấy thông báo chưa đọc
+ * Lay thong bao chua doc
  */
-async function getUnreadNotifications(req, res) {
+async function layThongBaoChuaDoc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const notifications = await notificationService.getUnreadNotifications(userId);
-    res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhSachThongBao = await thongBaoService.layThongBaoChuaDoc(maNguoiDung);
+    phanHoi.json(danhSachThongBao);
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message });
   }
 }
 
 /**
- * Đếm thông báo chưa đọc
+ * Dem thong bao chua doc
  */
-async function countUnread(req, res) {
+async function demChuaDoc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const count = await notificationService.countUnreadNotifications(userId);
-    res.json({ count });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const soLuong = await thongBaoService.demThongBaoChuaDoc(maNguoiDung);
+    phanHoi.json({ soLuong });
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message });
   }
 }
 
 /**
- * Tạo thông báo mới
+ * Tao thong bao moi
  */
-async function createNotification(req, res) {
+async function taoThongBao(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const notification = await notificationService.createNotification({
-      user_id: userId,
-      task_id: req.body.task_id,
-      message: req.body.message,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const thongBaoMoi = await thongBaoService.taoThongBao({
+      user_id: maNguoiDung,
+      task_id: yeuCau.body.task_id,
+      message: yeuCau.body.message,
     });
-    res.status(201).json({
-      message: "Tạo thông báo thành công.",
-      notification,
+    phanHoi.status(201).json({
+      message: "Tao thong bao thanh cong.",
+      thongBao: thongBaoMoi,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Đánh dấu đã đọc một thông báo
+ * Danh dau da doc mot thong bao
  */
-async function markAsRead(req, res) {
+async function danhDauDaDoc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const notification = await notificationService.markAsRead(parseInt(req.params.id), userId);
-    res.json({
-      message: "Đã đánh dấu đã đọc.",
-      notification,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const thongBao = await thongBaoService.danhDauDaDoc(parseInt(yeuCau.params.id), maNguoiDung);
+    phanHoi.json({
+      message: "Da danh dau da doc.",
+      thongBao,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Đánh dấu tất cả đã đọc
+ * Danh dau tat ca da doc
  */
-async function markAllAsRead(req, res) {
+async function danhDauTatCaDaDoc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const notifications = await notificationService.markAllAsRead(userId);
-    res.json({
-      message: "Đã đánh dấu tất cả là đã đọc.",
-      count: notifications.length,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhSachThongBao = await thongBaoService.danhDauTatCaDaDoc(maNguoiDung);
+    phanHoi.json({
+      message: "Da danh dau tat ca la da doc.",
+      soLuong: danhSachThongBao.length,
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message });
   }
 }
 
 /**
- * Xóa thông báo
+ * Xoa thong bao
  */
-async function deleteNotification(req, res) {
+async function xoaThongBao(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const notification = await notificationService.deleteNotification(parseInt(req.params.id), userId);
-    res.json({
-      message: "Đã xóa thông báo.",
-      notification,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const thongBao = await thongBaoService.xoaThongBao(parseInt(yeuCau.params.id), maNguoiDung);
+    phanHoi.json({
+      message: "Da xoa thong bao.",
+      thongBao,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Tạo thông báo nhắc việc tự động
+ * Tao thong bao nhac viec tu dong
  */
-async function generateReminders(req, res) {
+async function taoNhacViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const notifications = await notificationService.generateTaskReminders(userId);
-    res.json({
-      message: `Đã tạo ${notifications.length} thông báo nhắc việc.`,
-      notifications,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhSachThongBao = await thongBaoService.taoThongBaoNhacViec(maNguoiDung);
+    phanHoi.json({
+      message: `Da tao ${danhSachThongBao.length} thong bao nhac viec.`,
+      danhSachThongBao,
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message });
   }
 }
 
 module.exports = {
-  getNotifications,
-  getUnreadNotifications,
-  countUnread,
-  createNotification,
-  markAsRead,
-  markAllAsRead,
-  deleteNotification,
-  generateReminders,
+  layThongBao,
+  layThongBaoChuaDoc,
+  demChuaDoc,
+  taoThongBao,
+  danhDauDaDoc,
+  danhDauTatCaDaDoc,
+  xoaThongBao,
+  taoNhacViec,
 };

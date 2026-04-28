@@ -1,131 +1,131 @@
-const userService = require("../services/userService");
+const nguoiDungService = require("../services/userService");
 
 /**
- * Lấy danh sách tất cả người dùng (Admin)
+ * Lay danh sach tat ca nguoi dung (Admin)
  */
-async function getAllUsers(req, res) {
+async function layTatCaNguoiDung(yeuCau, phanHoi) {
   try {
-    const users = await userService.getAllUsers();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message || "Không lấy được danh sách người dùng." });
+    const danhSachNguoiDung = await nguoiDungService.layTatCaNguoiDung();
+    phanHoi.json(danhSachNguoiDung);
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message || "Khong lay duoc danh sach nguoi dung." });
   }
 }
 
 /**
- * Lấy thông tin người dùng theo ID
+ * Lay thong tin nguoi dung theo ID
  */
-async function getUserById(req, res) {
+async function layNguoiDungTheoId(yeuCau, phanHoi) {
   try {
-    const user = await userService.getUserById(parseInt(req.params.id));
-    res.json(user);
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+    const nguoiDung = await nguoiDungService.layNguoiDungTheoId(parseInt(yeuCau.params.id));
+    phanHoi.json(nguoiDung);
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Đăng ký tài khoản
+ * Dang ky tai khoan
  */
-async function register(req, res) {
+async function dangKy(yeuCau, phanHoi) {
   try {
-    const user = await userService.registerUser(req.body);
-    res.status(201).json({
-      message: "Đăng ký thành công.",
-      user,
+    const nguoiDung = await nguoiDungService.dangKyNguoiDung(yeuCau.body);
+    phanHoi.status(201).json({
+      message: "Dang ky thanh cong.",
+      nguoiDung,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Đăng nhập
+ * Dang nhap
  */
-async function login(req, res) {
+async function dangNhap(yeuCau, phanHoi) {
   try {
-    const user = await userService.loginUser(req.body);
-    res.json({
-      message: "Đăng nhập thành công.",
-      user,
+    const nguoiDung = await nguoiDungService.dangNhap(yeuCau.body);
+    phanHoi.json({
+      message: "Dang nhap thanh cong.",
+      nguoiDung,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Cập nhật thông tin cá nhân
+ * Cap nhat thong tin ca nhan
  */
-async function updateUser(req, res) {
+async function capNhatNguoiDung(yeuCau, phanHoi) {
   try {
-    const user = await userService.updateUser(parseInt(req.params.id), req.body);
-    res.json({
-      message: "Cập nhật thành công.",
-      user,
+    const nguoiDung = await nguoiDungService.capNhatNguoiDung(parseInt(yeuCau.params.id), yeuCau.body);
+    phanHoi.json({
+      message: "Cap nhat thanh cong.",
+      nguoiDung,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Đổi mật khẩu
+ * Doi mat khau
  */
-async function changePassword(req, res) {
+async function doiMatKhau(yeuCau, phanHoi) {
   try {
-    const result = await userService.changePassword(parseInt(req.params.id), req.body);
-    res.json(result);
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+    const ketQua = await nguoiDungService.doiMatKhau(parseInt(yeuCau.params.id), yeuCau.body);
+    phanHoi.json(ketQua);
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Khóa/mở khóa tài khoản (Admin)
+ * Khoa/mo khoa tai khoan (Admin)
  */
-async function setLockStatus(req, res) {
+async function datTrangThaiKhoa(yeuCau, phanHoi) {
   try {
-    const { is_locked } = req.body;
-    const user = await userService.setLockStatus(parseInt(req.params.id), is_locked);
-    res.json({
-      message: is_locked ? "Đã khóa tài khoản." : "Đã mở khóa tài khoản.",
-      user,
+    const { is_locked } = yeuCau.body;
+    const nguoiDung = await nguoiDungService.datTrangThaiKhoa(parseInt(yeuCau.params.id), is_locked);
+    phanHoi.json({
+      message: is_locked ? "Da khoa tai khoan." : "Da mo khoa tai khoan.",
+      nguoiDung,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Xóa người dùng
+ * Xoa nguoi dung
  */
-async function deleteUser(req, res) {
+async function xoaNguoiDung(yeuCau, phanHoi) {
   try {
-    const user = await userService.deleteUser(parseInt(req.params.id));
-    res.json({
-      message: "Đã xóa người dùng.",
-      user,
+    const nguoiDung = await nguoiDungService.xoaNguoiDung(parseInt(yeuCau.params.id));
+    phanHoi.json({
+      message: "Da xoa nguoi dung.",
+      nguoiDung,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 module.exports = {
-  getAllUsers,
-  getUserById,
-  register,
-  login,
-  updateUser,
-  changePassword,
-  setLockStatus,
-  deleteUser,
+  layTatCaNguoiDung,
+  layNguoiDungTheoId,
+  dangKy,
+  dangNhap,
+  capNhatNguoiDung,
+  doiMatKhau,
+  datTrangThaiKhoa,
+  xoaNguoiDung,
 };

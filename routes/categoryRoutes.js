@@ -1,21 +1,21 @@
 const express = require("express");
-const categoryController = require("../controllers/categoryController");
+const dieuKhienDanhMuc = require("../controllers/categoryController");
 
-const router = express.Router();
+const boTuyenDuong = express.Router();
 
-// Lấy tất cả danh mục của user
-router.get("/user/:userId", categoryController.getCategories);
+// Lay tat ca danh muc cua nguoi dung
+boTuyenDuong.get("/user/:userId", dieuKhienDanhMuc.layDanhMuc);
 
-// Lấy danh mục theo ID
-router.get("/:id", categoryController.getCategoryById);
+// Lay danh muc theo ID
+boTuyenDuong.get("/:id", dieuKhienDanhMuc.layDanhMucTheoId);
 
-// Tạo danh mục mới
-router.post("/user/:userId", categoryController.createCategory);
+// Tao danh muc moi
+boTuyenDuong.post("/user/:userId", dieuKhienDanhMuc.taoDanhMuc);
 
-// Cập nhật danh mục
-router.put("/:id/user/:userId", categoryController.updateCategory);
+// Cap nhat danh muc
+boTuyenDuong.put("/:id/user/:userId", dieuKhienDanhMuc.capNhatDanhMuc);
 
-// Xóa danh mục
-router.delete("/:id/user/:userId", categoryController.deleteCategory);
+// Xoa danh muc
+boTuyenDuong.delete("/:id/user/:userId", dieuKhienDanhMuc.xoaDanhMuc);
 
-module.exports = router;
+module.exports = boTuyenDuong;

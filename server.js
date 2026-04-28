@@ -2,68 +2,162 @@ require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
-const { initializeDatabase } = require("./config/db");
+const fs = require("fs");
+const { khoiTaoDatabase } = require("./config/db");
 
-// Import routes
-const userRoutes = require("./routes/userRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
-const taskRoutes = require("./routes/taskRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
+// Nhap cac tuyen duong
+const tuyenDuongNguoiDung = require("./routes/userRoutes");
+const tuyenDuongDanhMuc = require("./routes/categoryRoutes");
+const tuyenDuongCongViec = require("./routes/taskRoutes");
+const tuyenDuongThongBao = require("./routes/notificationRoutes");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const ungDung = express();
+const CONG = process.env.PORT || 3000;
+
+// Duong dan file du lieu JSON
+const DUONG_DAN_DU_LIEU = path.join(__dirname, "data", "tasks.json");
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+ungDung.use(express.json());
+ungDung.use(express.urlencoded({ extended: true }));
+ungDung.use(express.static(path.join(__dirname, "public")));
 
-// CORS (cho phép frontend gọi API)
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
+// CORS (cho phep frontend goi API)
+ungDung.use((yeuCau, phanHoi, tiepTheo) => {
+  phanHoi.header("Access-Control-Allow-Origin", "*");
+  phanHoi.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  phanHoi.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (yeuCau.method === "OPTIONS") {
+    return phanHoi.sendStatus(200);
   }
-  next();
+  tiepTheo();
 });
 
-// API Routes
-app.use("/api/users", userRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/notifications", notificationRoutes);
+// === API don gian voi file JSON (cho frontend hoat dong doc lap) ===
 
-// Health check
-app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    message: "Server đang hoạt động.",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error("❌ Server Error:", err.message);
-  res.status(err.statusCode || 500).json({
-    message: err.message || "Lỗi hệ thống.",
-  });
-});
-
-// Khởi tạo database và chạy server
-async function startServer() {
+// Doc du lieu tu file JSON
+function docDuLieu() {
   try {
-    await initializeDatabase();
-    app.listen(PORT, () => {
-      console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
-      console.log(`📡 API: http://localhost:${PORT}/api`);
+    const noiDung = fs.readFileSync(DUONG_DAN_DU_LIEU, "utf8");
+    return JSON.parse(noiDung);
+  } catch (loi) {
+    return [];
+  }
+}
+
+// Ghi du lieu vao file JSON
+function ghiDuLieu(danhSachCongViec) {
+  fs.writeFileSync(DUONG_DAN_DU_LIEU, JSON.stringify(danhSachCongViec, null, 2), "utf8");
+}
+
+// Tao ID ngau nhien
+function taoId() {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+}
+
+// Lay tat ca cong viec
+ungDung.get("/api/tasks", (yeuCau, phanHoi) => {
+  const danhSachCongViec = docDuLieu();
+  phanHoi.json(danhSachCongViec);
+});
+
+// Tao cong viec moi
+ungDung.post("/api/tasks", (yeuCau, phanHoi) => {
+  const danhSachCongViec = docDuLieu();
+  const congViecMoi = {
+    id: taoId(),
+    title: yeuCau.body.title || "",
+    description: yeuCau.body.description || "",
+    status: yeuCau.body.status || "not-started",
+    priority: yeuCau.body.priority || "medium",
+    dueDate: yeuCau.body.dueDate || null,
+    createdAt: new Date().toISOString(),
+  };
+
+  danhSachCongViec.push(congViecMoi);
+  ghiDuLieu(danhSachCongViec);
+
+  phanHoi.status(201).json(congViecMoi);
+});
+
+// Cap nhat cong viec
+ungDung.put("/api/tasks/:id", (yeuCau, phanHoi) => {
+  const danhSachCongViec = docDuLieu();
+  const chiSo = danhSachCongViec.findIndex((cv) => cv.id === yeuCau.params.id);
+
+  if (chiSo === -1) {
+    return phanHoi.status(404).json({ message: "Khong tim thay cong viec." });
+  }
+
+  danhSachCongViec[chiSo] = {
+    ...danhSachCongViec[chiSo],
+    title: yeuCau.body.title ?? danhSachCongViec[chiSo].title,
+    description: yeuCau.body.description ?? danhSachCongViec[chiSo].description,
+    status: yeuCau.body.status ?? danhSachCongViec[chiSo].status,
+    priority: yeuCau.body.priority ?? danhSachCongViec[chiSo].priority,
+    dueDate: yeuCau.body.dueDate ?? danhSachCongViec[chiSo].dueDate,
+  };
+
+  ghiDuLieu(danhSachCongViec);
+  phanHoi.json(danhSachCongViec[chiSo]);
+});
+
+// Xoa cong viec
+ungDung.delete("/api/tasks/:id", (yeuCau, phanHoi) => {
+  let danhSachCongViec = docDuLieu();
+  const chiSo = danhSachCongViec.findIndex((cv) => cv.id === yeuCau.params.id);
+
+  if (chiSo === -1) {
+    return phanHoi.status(404).json({ message: "Khong tim thay cong viec." });
+  }
+
+  const congViecDaXoa = danhSachCongViec.splice(chiSo, 1)[0];
+  ghiDuLieu(danhSachCongViec);
+  phanHoi.json({ message: "Da xoa cong viec.", congViec: congViecDaXoa });
+});
+
+// === API voi PostgreSQL (khi co database) ===
+ungDung.use("/api/users", tuyenDuongNguoiDung);
+ungDung.use("/api/categories", tuyenDuongDanhMuc);
+ungDung.use("/api/db-tasks", tuyenDuongCongViec);
+ungDung.use("/api/notifications", tuyenDuongThongBao);
+
+// Kiem tra suc khoe server
+ungDung.get("/api/health", (yeuCau, phanHoi) => {
+  phanHoi.json({
+    trangThai: "ok",
+    thongBao: "Server dang hoat dong.",
+    thoiGian: new Date().toISOString(),
+  });
+});
+
+// Xu ly loi middleware
+ungDung.use((loi, yeuCau, phanHoi, tiepTheo) => {
+  console.error("❌ Loi Server:", loi.message);
+  phanHoi.status(loi.statusCode || 500).json({
+    message: loi.message || "Loi he thong.",
+  });
+});
+
+// Khoi dong server
+async function khoiDongServer() {
+  try {
+    // Thu ket noi database (khong bat buoc)
+    try {
+      await khoiTaoDatabase();
+      console.log("✅ Da ket noi PostgreSQL.");
+    } catch (loiDB) {
+      console.warn("⚠️ Khong ket noi duoc PostgreSQL, chi su dung file JSON:", loiDB.message);
+    }
+
+    ungDung.listen(CONG, () => {
+      console.log(`🚀 Server dang chay tai http://localhost:${CONG}`);
+      console.log(`📡 API: http://localhost:${CONG}/api`);
     });
-  } catch (error) {
-    console.error("❌ Không thể khởi động server:", error.message);
+  } catch (loi) {
+    console.error("❌ Khong the khoi dong server:", loi.message);
     process.exit(1);
   }
 }
 
-startServer();
+khoiDongServer();

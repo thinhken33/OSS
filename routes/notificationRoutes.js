@@ -1,30 +1,30 @@
 const express = require("express");
-const notificationController = require("../controllers/notificationController");
+const dieuKhienThongBao = require("../controllers/notificationController");
 
-const router = express.Router();
+const boTuyenDuong = express.Router();
 
-// Lấy tất cả thông báo của user
-router.get("/user/:userId", notificationController.getNotifications);
+// Lay tat ca thong bao cua nguoi dung
+boTuyenDuong.get("/user/:userId", dieuKhienThongBao.layThongBao);
 
-// Lấy thông báo chưa đọc
-router.get("/user/:userId/unread", notificationController.getUnreadNotifications);
+// Lay thong bao chua doc
+boTuyenDuong.get("/user/:userId/unread", dieuKhienThongBao.layThongBaoChuaDoc);
 
-// Đếm thông báo chưa đọc
-router.get("/user/:userId/unread/count", notificationController.countUnread);
+// Dem thong bao chua doc
+boTuyenDuong.get("/user/:userId/unread/count", dieuKhienThongBao.demChuaDoc);
 
-// Tạo thông báo mới
-router.post("/user/:userId", notificationController.createNotification);
+// Tao thong bao moi
+boTuyenDuong.post("/user/:userId", dieuKhienThongBao.taoThongBao);
 
-// Tạo thông báo nhắc việc tự động
-router.post("/user/:userId/reminders", notificationController.generateReminders);
+// Tao thong bao nhac viec tu dong
+boTuyenDuong.post("/user/:userId/reminders", dieuKhienThongBao.taoNhacViec);
 
-// Đánh dấu tất cả đã đọc
-router.patch("/user/:userId/read-all", notificationController.markAllAsRead);
+// Danh dau tat ca da doc
+boTuyenDuong.patch("/user/:userId/read-all", dieuKhienThongBao.danhDauTatCaDaDoc);
 
-// Đánh dấu đã đọc một thông báo
-router.patch("/:id/user/:userId/read", notificationController.markAsRead);
+// Danh dau da doc mot thong bao
+boTuyenDuong.patch("/:id/user/:userId/read", dieuKhienThongBao.danhDauDaDoc);
 
-// Xóa thông báo
-router.delete("/:id/user/:userId", notificationController.deleteNotification);
+// Xoa thong bao
+boTuyenDuong.delete("/:id/user/:userId", dieuKhienThongBao.xoaThongBao);
 
-module.exports = router;
+module.exports = boTuyenDuong;

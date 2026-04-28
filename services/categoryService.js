@@ -1,100 +1,100 @@
-const categoryModel = require("../models/categoryModel");
+const danhMucModel = require("../models/categoryModel");
 
-function createError(message, statusCode) {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
+function taoLoi(thongBao, maLoi) {
+  const loi = new Error(thongBao);
+  loi.statusCode = maLoi;
+  return loi;
 }
 
 /**
- * Lấy tất cả danh mục của user
+ * Lay tat ca danh muc cua nguoi dung
  */
-async function getCategoriesByUserId(userId) {
-  return await categoryModel.getCategoriesByUserId(userId);
+async function layDanhMucTheoNguoiDung(maNguoiDung) {
+  return await danhMucModel.layDanhMucTheoNguoiDung(maNguoiDung);
 }
 
 /**
- * Lấy danh mục theo ID
+ * Lay danh muc theo ID
  */
-async function getCategoryById(id) {
-  const category = await categoryModel.getCategoryById(id);
-  if (!category) {
-    throw createError("Không tìm thấy danh mục.", 404);
+async function layDanhMucTheoId(maDanhMuc) {
+  const danhMuc = await danhMucModel.layDanhMucTheoId(maDanhMuc);
+  if (!danhMuc) {
+    throw taoLoi("Khong tim thay danh muc.", 404);
   }
-  return category;
+  return danhMuc;
 }
 
 /**
- * Tạo danh mục mới
+ * Tao danh muc moi
  */
-async function createCategory(userId, { name }) {
-  // Validate
+async function taoDanhMuc(maNguoiDung, { name }) {
+  // Kiem tra du lieu
   if (!name || !name.trim()) {
-    throw createError("Tên danh mục không được để trống.", 400);
+    throw taoLoi("Ten danh muc khong duoc de trong.", 400);
   }
 
-  // Kiểm tra trùng tên
-  const existing = await categoryModel.getCategoryByName(userId, name.trim());
-  if (existing) {
-    throw createError("Tên danh mục đã tồn tại.", 409);
+  // Kiem tra trung ten
+  const danhMucTonTai = await danhMucModel.layDanhMucTheoTen(maNguoiDung, name.trim());
+  if (danhMucTonTai) {
+    throw taoLoi("Ten danh muc da ton tai.", 409);
   }
 
-  return await categoryModel.createCategory({
-    user_id: userId,
+  return await danhMucModel.taoDanhMuc({
+    user_id: maNguoiDung,
     name: name.trim(),
   });
 }
 
 /**
- * Cập nhật danh mục
+ * Cap nhat danh muc
  */
-async function updateCategory(id, userId, { name }) {
+async function capNhatDanhMuc(maDanhMuc, maNguoiDung, { name }) {
   if (!name || !name.trim()) {
-    throw createError("Tên danh mục không được để trống.", 400);
+    throw taoLoi("Ten danh muc khong duoc de trong.", 400);
   }
 
-  // Kiểm tra danh mục có tồn tại
-  const category = await categoryModel.getCategoryById(id);
-  if (!category) {
-    throw createError("Không tìm thấy danh mục để sửa.", 404);
+  // Kiem tra danh muc co ton tai
+  const danhMuc = await danhMucModel.layDanhMucTheoId(maDanhMuc);
+  if (!danhMuc) {
+    throw taoLoi("Khong tim thay danh muc de sua.", 404);
   }
 
-  // Kiểm tra quyền sở hữu
-  if (category.user_id !== userId) {
-    throw createError("Bạn không có quyền sửa danh mục này.", 403);
+  // Kiem tra quyen so huu
+  if (danhMuc.user_id !== maNguoiDung) {
+    throw taoLoi("Ban khong co quyen sua danh muc nay.", 403);
   }
 
-  // Kiểm tra trùng tên (trừ chính nó)
-  const existing = await categoryModel.getCategoryByName(userId, name.trim());
-  if (existing && existing.category_id !== id) {
-    throw createError("Tên danh mục đã tồn tại.", 409);
+  // Kiem tra trung ten (tru chinh no)
+  const danhMucTonTai = await danhMucModel.layDanhMucTheoTen(maNguoiDung, name.trim());
+  if (danhMucTonTai && danhMucTonTai.category_id !== maDanhMuc) {
+    throw taoLoi("Ten danh muc da ton tai.", 409);
   }
 
-  return await categoryModel.updateCategory(id, { name: name.trim() });
+  return await danhMucModel.capNhatDanhMuc(maDanhMuc, { name: name.trim() });
 }
 
 /**
- * Xóa danh mục
+ * Xoa danh muc
  */
-async function deleteCategory(id, userId) {
-  const category = await categoryModel.getCategoryById(id);
-  if (!category) {
-    throw createError("Không tìm thấy danh mục để xóa.", 404);
+async function xoaDanhMuc(maDanhMuc, maNguoiDung) {
+  const danhMuc = await danhMucModel.layDanhMucTheoId(maDanhMuc);
+  if (!danhMuc) {
+    throw taoLoi("Khong tim thay danh muc de xoa.", 404);
   }
 
-  // Kiểm tra quyền sở hữu
-  if (category.user_id !== userId) {
-    throw createError("Bạn không có quyền xóa danh mục này.", 403);
+  // Kiem tra quyen so huu
+  if (danhMuc.user_id !== maNguoiDung) {
+    throw taoLoi("Ban khong co quyen xoa danh muc nay.", 403);
   }
 
-  await categoryModel.deleteCategory(id);
-  return category;
+  await danhMucModel.xoaDanhMuc(maDanhMuc);
+  return danhMuc;
 }
 
 module.exports = {
-  getCategoriesByUserId,
-  getCategoryById,
-  createCategory,
-  updateCategory,
-  deleteCategory,
+  layDanhMucTheoNguoiDung,
+  layDanhMucTheoId,
+  taoDanhMuc,
+  capNhatDanhMuc,
+  xoaDanhMuc,
 };

@@ -1,86 +1,86 @@
-const categoryService = require("../services/categoryService");
+const danhMucService = require("../services/categoryService");
 
 /**
- * Lấy tất cả danh mục của user
+ * Lay tat ca danh muc cua nguoi dung
  */
-async function getCategories(req, res) {
+async function layDanhMuc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const categories = await categoryService.getCategoriesByUserId(userId);
-    res.json(categories);
-  } catch (error) {
-    res.status(500).json({ message: error.message || "Không lấy được danh mục." });
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhSachDanhMuc = await danhMucService.layDanhMucTheoNguoiDung(maNguoiDung);
+    phanHoi.json(danhSachDanhMuc);
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message || "Khong lay duoc danh muc." });
   }
 }
 
 /**
- * Lấy danh mục theo ID
+ * Lay danh muc theo ID
  */
-async function getCategoryById(req, res) {
+async function layDanhMucTheoId(yeuCau, phanHoi) {
   try {
-    const category = await categoryService.getCategoryById(parseInt(req.params.id));
-    res.json(category);
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+    const danhMuc = await danhMucService.layDanhMucTheoId(parseInt(yeuCau.params.id));
+    phanHoi.json(danhMuc);
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Tạo danh mục mới
+ * Tao danh muc moi
  */
-async function createCategory(req, res) {
+async function taoDanhMuc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const category = await categoryService.createCategory(userId, req.body);
-    res.status(201).json({
-      message: "Tạo danh mục thành công.",
-      category,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhMuc = await danhMucService.taoDanhMuc(maNguoiDung, yeuCau.body);
+    phanHoi.status(201).json({
+      message: "Tao danh muc thanh cong.",
+      danhMuc,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Cập nhật danh mục
+ * Cap nhat danh muc
  */
-async function updateCategory(req, res) {
+async function capNhatDanhMuc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const category = await categoryService.updateCategory(parseInt(req.params.id), userId, req.body);
-    res.json({
-      message: "Cập nhật danh mục thành công.",
-      category,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhMuc = await danhMucService.capNhatDanhMuc(parseInt(yeuCau.params.id), maNguoiDung, yeuCau.body);
+    phanHoi.json({
+      message: "Cap nhat danh muc thanh cong.",
+      danhMuc,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Xóa danh mục
+ * Xoa danh muc
  */
-async function deleteCategory(req, res) {
+async function xoaDanhMuc(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const category = await categoryService.deleteCategory(parseInt(req.params.id), userId);
-    res.json({
-      message: "Đã xóa danh mục.",
-      category,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhMuc = await danhMucService.xoaDanhMuc(parseInt(yeuCau.params.id), maNguoiDung);
+    phanHoi.json({
+      message: "Da xoa danh muc.",
+      danhMuc,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 module.exports = {
-  getCategories,
-  getCategoryById,
-  createCategory,
-  updateCategory,
-  deleteCategory,
+  layDanhMuc,
+  layDanhMucTheoId,
+  taoDanhMuc,
+  capNhatDanhMuc,
+  xoaDanhMuc,
 };

@@ -1,30 +1,30 @@
 const express = require("express");
-const taskController = require("../controllers/taskController");
+const dieuKhienCongViec = require("../controllers/taskController");
 
-const router = express.Router();
+const boTuyenDuong = express.Router();
 
-// Lấy tất cả tasks của user
-router.get("/user/:userId", taskController.getTasks);
+// Lay tat ca cong viec cua nguoi dung
+boTuyenDuong.get("/user/:userId", dieuKhienCongViec.layCongViec);
 
-// Tìm kiếm & lọc tasks
-router.get("/user/:userId/search", taskController.searchTasks);
+// Tim kiem & loc cong viec
+boTuyenDuong.get("/user/:userId/search", dieuKhienCongViec.timKiemCongViec);
 
-// Lấy thống kê tasks
-router.get("/user/:userId/stats", taskController.getTaskStats);
+// Lay thong ke cong viec
+boTuyenDuong.get("/user/:userId/stats", dieuKhienCongViec.layThongKeCongViec);
 
-// Lấy task theo ID
-router.get("/:id", taskController.getTaskById);
+// Lay cong viec theo ID
+boTuyenDuong.get("/:id", dieuKhienCongViec.layCongViecTheoId);
 
-// Tạo task mới
-router.post("/user/:userId", taskController.createTask);
+// Tao cong viec moi
+boTuyenDuong.post("/user/:userId", dieuKhienCongViec.taoCongViec);
 
-// Cập nhật task
-router.put("/:id/user/:userId", taskController.updateTask);
+// Cap nhat cong viec
+boTuyenDuong.put("/:id/user/:userId", dieuKhienCongViec.capNhatCongViec);
 
-// Cập nhật trạng thái task
-router.patch("/:id/user/:userId/status", taskController.updateTaskStatus);
+// Cap nhat trang thai cong viec
+boTuyenDuong.patch("/:id/user/:userId/status", dieuKhienCongViec.capNhatTrangThaiCongViec);
 
-// Xóa task
-router.delete("/:id/user/:userId", taskController.deleteTask);
+// Xoa cong viec
+boTuyenDuong.delete("/:id/user/:userId", dieuKhienCongViec.xoaCongViec);
 
-module.exports = router;
+module.exports = boTuyenDuong;

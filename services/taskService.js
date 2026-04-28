@@ -1,187 +1,187 @@
-const taskModel = require("../models/taskModel");
+const congViecModel = require("../models/taskModel");
 
-function createError(message, statusCode) {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
+function taoLoi(thongBao, maLoi) {
+  const loi = new Error(thongBao);
+  loi.statusCode = maLoi;
+  return loi;
 }
 
 /**
- * Validate dữ liệu task
+ * Kiem tra du lieu cong viec
  */
-function validateTask(taskData) {
-  const errors = [];
+function kiemTraDuLieuCongViec(duLieu) {
+  const danhSachLoi = [];
 
-  if (!taskData.title || typeof taskData.title !== "string" || !taskData.title.trim()) {
-    errors.push("Tên công việc không được để trống.");
+  if (!duLieu.title || typeof duLieu.title !== "string" || !duLieu.title.trim()) {
+    danhSachLoi.push("Ten cong viec khong duoc de trong.");
   }
 
-  const allowedStatus = ["pending", "in_progress", "completed", "overdue"];
-  if (taskData.status && !allowedStatus.includes(taskData.status)) {
-    errors.push("Trạng thái không hợp lệ.");
+  const trangThaiHopLe = ["pending", "in_progress", "completed", "overdue"];
+  if (duLieu.status && !trangThaiHopLe.includes(duLieu.status)) {
+    danhSachLoi.push("Trang thai khong hop le.");
   }
 
-  const allowedPriority = ["low", "medium", "high"];
-  if (taskData.priority && !allowedPriority.includes(taskData.priority)) {
-    errors.push("Mức ưu tiên không hợp lệ.");
+  const mucUuTienHopLe = ["low", "medium", "high"];
+  if (duLieu.priority && !mucUuTienHopLe.includes(duLieu.priority)) {
+    danhSachLoi.push("Muc uu tien khong hop le.");
   }
 
-  // Kiểm tra hạn hoàn thành >= ngày bắt đầu
-  if (taskData.start_date && taskData.due_date) {
-    if (new Date(taskData.due_date) < new Date(taskData.start_date)) {
-      errors.push("Hạn hoàn thành không được nhỏ hơn ngày bắt đầu.");
+  // Kiem tra han hoan thanh >= ngay bat dau
+  if (duLieu.start_date && duLieu.due_date) {
+    if (new Date(duLieu.due_date) < new Date(duLieu.start_date)) {
+      danhSachLoi.push("Han hoan thanh khong duoc nho hon ngay bat dau.");
     }
   }
 
-  return errors;
+  return danhSachLoi;
 }
 
 /**
- * Lấy tất cả tasks của user
+ * Lay tat ca cong viec cua nguoi dung
  */
-async function getTasksByUserId(userId) {
-  return await taskModel.getTasksByUserId(userId);
+async function layCongViecTheoNguoiDung(maNguoiDung) {
+  return await congViecModel.layCongViecTheoNguoiDung(maNguoiDung);
 }
 
 /**
- * Lấy task theo ID
+ * Lay cong viec theo ID
  */
-async function getTaskById(id) {
-  const task = await taskModel.getTaskById(id);
-  if (!task) {
-    throw createError("Không tìm thấy công việc.", 404);
+async function layCongViecTheoId(maCongViec) {
+  const congViec = await congViecModel.layCongViecTheoId(maCongViec);
+  if (!congViec) {
+    throw taoLoi("Khong tim thay cong viec.", 404);
   }
-  return task;
+  return congViec;
 }
 
 /**
- * Tạo task mới
+ * Tao cong viec moi
  */
-async function createTask(userId, taskData) {
-  const errors = validateTask(taskData);
-  if (errors.length) {
-    throw createError(errors.join(" "), 400);
+async function taoCongViec(maNguoiDung, duLieuCongViec) {
+  const danhSachLoi = kiemTraDuLieuCongViec(duLieuCongViec);
+  if (danhSachLoi.length) {
+    throw taoLoi(danhSachLoi.join(" "), 400);
   }
 
-  return await taskModel.createTask({
-    user_id: userId,
-    category_id: taskData.category_id || null,
-    title: taskData.title.trim(),
-    description: (taskData.description || "").trim(),
-    start_date: taskData.start_date || null,
-    due_date: taskData.due_date || null,
-    priority: taskData.priority || "medium",
-    status: taskData.status || "pending",
+  return await congViecModel.taoCongViec({
+    user_id: maNguoiDung,
+    category_id: duLieuCongViec.category_id || null,
+    title: duLieuCongViec.title.trim(),
+    description: (duLieuCongViec.description || "").trim(),
+    start_date: duLieuCongViec.start_date || null,
+    due_date: duLieuCongViec.due_date || null,
+    priority: duLieuCongViec.priority || "medium",
+    status: duLieuCongViec.status || "pending",
   });
 }
 
 /**
- * Cập nhật task
+ * Cap nhat cong viec
  */
-async function updateTask(id, userId, taskData) {
-  const errors = validateTask(taskData);
-  if (errors.length) {
-    throw createError(errors.join(" "), 400);
+async function capNhatCongViec(maCongViec, maNguoiDung, duLieuCongViec) {
+  const danhSachLoi = kiemTraDuLieuCongViec(duLieuCongViec);
+  if (danhSachLoi.length) {
+    throw taoLoi(danhSachLoi.join(" "), 400);
   }
 
-  const oldTask = await taskModel.getTaskById(id);
-  if (!oldTask) {
-    throw createError("Không tìm thấy công việc để sửa.", 404);
+  const congViecCu = await congViecModel.layCongViecTheoId(maCongViec);
+  if (!congViecCu) {
+    throw taoLoi("Khong tim thay cong viec de sua.", 404);
   }
 
-  // Kiểm tra quyền sở hữu
-  if (oldTask.user_id !== userId) {
-    throw createError("Bạn không có quyền sửa công việc này.", 403);
+  // Kiem tra quyen so huu
+  if (congViecCu.user_id !== maNguoiDung) {
+    throw taoLoi("Ban khong co quyen sua cong viec nay.", 403);
   }
 
-  // Nếu chuyển sang completed, lưu thời điểm hoàn thành
-  let completed_at = oldTask.completed_at;
-  if (taskData.status === "completed" && oldTask.status !== "completed") {
-    completed_at = new Date().toISOString();
-  } else if (taskData.status !== "completed") {
-    completed_at = null;
+  // Neu chuyen sang completed, luu thoi diem hoan thanh
+  let thoiDiemHoanThanh = congViecCu.completed_at;
+  if (duLieuCongViec.status === "completed" && congViecCu.status !== "completed") {
+    thoiDiemHoanThanh = new Date().toISOString();
+  } else if (duLieuCongViec.status !== "completed") {
+    thoiDiemHoanThanh = null;
   }
 
-  return await taskModel.updateTask(id, {
-    category_id: taskData.category_id || null,
-    title: taskData.title.trim(),
-    description: (taskData.description || "").trim(),
-    start_date: taskData.start_date || null,
-    due_date: taskData.due_date || null,
-    priority: taskData.priority || "medium",
-    status: taskData.status || "pending",
-    completed_at,
+  return await congViecModel.capNhatCongViec(maCongViec, {
+    category_id: duLieuCongViec.category_id || null,
+    title: duLieuCongViec.title.trim(),
+    description: (duLieuCongViec.description || "").trim(),
+    start_date: duLieuCongViec.start_date || null,
+    due_date: duLieuCongViec.due_date || null,
+    priority: duLieuCongViec.priority || "medium",
+    status: duLieuCongViec.status || "pending",
+    completed_at: thoiDiemHoanThanh,
   });
 }
 
 /**
- * Cập nhật trạng thái task
+ * Cap nhat trang thai cong viec
  */
-async function updateTaskStatus(id, userId, status) {
-  const allowedStatus = ["pending", "in_progress", "completed", "overdue"];
-  if (!allowedStatus.includes(status)) {
-    throw createError("Trạng thái không hợp lệ.", 400);
+async function capNhatTrangThaiCongViec(maCongViec, maNguoiDung, trangThai) {
+  const trangThaiHopLe = ["pending", "in_progress", "completed", "overdue"];
+  if (!trangThaiHopLe.includes(trangThai)) {
+    throw taoLoi("Trang thai khong hop le.", 400);
   }
 
-  const task = await taskModel.getTaskById(id);
-  if (!task) {
-    throw createError("Không tìm thấy công việc.", 404);
+  const congViec = await congViecModel.layCongViecTheoId(maCongViec);
+  if (!congViec) {
+    throw taoLoi("Khong tim thay cong viec.", 404);
   }
 
-  if (task.user_id !== userId) {
-    throw createError("Bạn không có quyền cập nhật công việc này.", 403);
+  if (congViec.user_id !== maNguoiDung) {
+    throw taoLoi("Ban khong co quyen cap nhat cong viec nay.", 403);
   }
 
-  const completed_at = status === "completed" ? new Date().toISOString() : null;
-  return await taskModel.updateTaskStatus(id, status, completed_at);
+  const thoiDiemHoanThanh = trangThai === "completed" ? new Date().toISOString() : null;
+  return await congViecModel.capNhatTrangThaiCongViec(maCongViec, trangThai, thoiDiemHoanThanh);
 }
 
 /**
- * Xóa task
+ * Xoa cong viec
  */
-async function deleteTask(id, userId) {
-  const task = await taskModel.getTaskById(id);
-  if (!task) {
-    throw createError("Không tìm thấy công việc để xóa.", 404);
+async function xoaCongViec(maCongViec, maNguoiDung) {
+  const congViec = await congViecModel.layCongViecTheoId(maCongViec);
+  if (!congViec) {
+    throw taoLoi("Khong tim thay cong viec de xoa.", 404);
   }
 
-  if (task.user_id !== userId) {
-    throw createError("Bạn không có quyền xóa công việc này.", 403);
+  if (congViec.user_id !== maNguoiDung) {
+    throw taoLoi("Ban khong co quyen xoa cong viec nay.", 403);
   }
 
-  await taskModel.deleteTask(id);
-  return task;
+  await congViecModel.xoaCongViec(maCongViec);
+  return congViec;
 }
 
 /**
- * Tìm kiếm và lọc tasks
+ * Tim kiem va loc cong viec
  */
-async function searchTasks(userId, filters) {
-  return await taskModel.searchTasks(userId, filters);
+async function timKiemCongViec(maNguoiDung, boLoc) {
+  return await congViecModel.timKiemCongViec(maNguoiDung, boLoc);
 }
 
 /**
- * Lấy thống kê tasks
+ * Lay thong ke cong viec
  */
-async function getTaskStats(userId) {
-  return await taskModel.getTaskStats(userId);
+async function layThongKeCongViec(maNguoiDung) {
+  return await congViecModel.layThongKeCongViec(maNguoiDung);
 }
 
 /**
- * Đánh dấu tự động các task quá hạn
+ * Danh dau tu dong cac cong viec qua han
  */
-async function markOverdueTasks() {
-  return await taskModel.markOverdueTasks();
+async function danhDauCongViecQuaHan() {
+  return await congViecModel.danhDauCongViecQuaHan();
 }
 
 module.exports = {
-  getTasksByUserId,
-  getTaskById,
-  createTask,
-  updateTask,
-  updateTaskStatus,
-  deleteTask,
-  searchTasks,
-  getTaskStats,
-  markOverdueTasks,
+  layCongViecTheoNguoiDung,
+  layCongViecTheoId,
+  taoCongViec,
+  capNhatCongViec,
+  capNhatTrangThaiCongViec,
+  xoaCongViec,
+  timKiemCongViec,
+  layThongKeCongViec,
+  danhDauCongViecQuaHan,
 };

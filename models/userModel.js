@@ -1,107 +1,107 @@
 const db = require("../config/db");
 
 /**
- * Lấy tất cả người dùng (không trả password_hash)
+ * Lay tat ca nguoi dung (khong tra password_hash)
  */
-async function getAllUsers() {
-  const result = await db.query(
+async function layTatCaNguoiDung() {
+  const ketQua = await db.truyVan(
     `SELECT user_id, full_name, email, avatar_url, bio, role, is_locked, created_at
      FROM Users ORDER BY created_at DESC`
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Lấy người dùng theo ID
+ * Lay nguoi dung theo ID
  */
-async function getUserById(id) {
-  const result = await db.query(
+async function layNguoiDungTheoId(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `SELECT user_id, full_name, email, avatar_url, bio, role, is_locked, created_at
      FROM Users WHERE user_id = $1`,
-    [id]
+    [maNguoiDung]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Lấy người dùng theo email (bao gồm password_hash để xác thực)
+ * Lay nguoi dung theo email (bao gom password_hash de xac thuc)
  */
-async function getUserByEmail(email) {
-  const result = await db.query(
+async function layNguoiDungTheoEmail(email) {
+  const ketQua = await db.truyVan(
     `SELECT * FROM Users WHERE email = $1`,
     [email]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Tạo người dùng mới
+ * Tao nguoi dung moi
  */
-async function createUser({ full_name, email, password_hash, avatar_url, bio }) {
-  const result = await db.query(
+async function taoNguoiDung({ full_name, email, password_hash, avatar_url, bio }) {
+  const ketQua = await db.truyVan(
     `INSERT INTO Users (full_name, email, password_hash, avatar_url, bio)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING user_id, full_name, email, avatar_url, bio, role, is_locked, created_at`,
     [full_name, email, password_hash, avatar_url || null, bio || null]
   );
-  return result.rows[0];
+  return ketQua.rows[0];
 }
 
 /**
- * Cập nhật thông tin người dùng
+ * Cap nhat thong tin nguoi dung
  */
-async function updateUser(id, { full_name, avatar_url, bio }) {
-  const result = await db.query(
+async function capNhatNguoiDung(maNguoiDung, { full_name, avatar_url, bio }) {
+  const ketQua = await db.truyVan(
     `UPDATE Users
      SET full_name = $1, avatar_url = $2, bio = $3
      WHERE user_id = $4
      RETURNING user_id, full_name, email, avatar_url, bio, role, is_locked, created_at`,
-    [full_name, avatar_url || null, bio || null, id]
+    [full_name, avatar_url || null, bio || null, maNguoiDung]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Cập nhật mật khẩu
+ * Cap nhat mat khau
  */
-async function updatePassword(id, password_hash) {
-  const result = await db.query(
+async function capNhatMatKhau(maNguoiDung, matKhauHash) {
+  const ketQua = await db.truyVan(
     `UPDATE Users SET password_hash = $1 WHERE user_id = $2 RETURNING user_id`,
-    [password_hash, id]
+    [matKhauHash, maNguoiDung]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Khóa / mở khóa tài khoản (Admin)
+ * Khoa / mo khoa tai khoan (Admin)
  */
-async function setLockStatus(id, is_locked) {
-  const result = await db.query(
+async function datTrangThaiKhoa(maNguoiDung, daKhoa) {
+  const ketQua = await db.truyVan(
     `UPDATE Users SET is_locked = $1 WHERE user_id = $2
      RETURNING user_id, full_name, email, role, is_locked`,
-    [is_locked, id]
+    [daKhoa, maNguoiDung]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Xóa người dùng
+ * Xoa nguoi dung
  */
-async function deleteUser(id) {
-  const result = await db.query(
+async function xoaNguoiDung(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `DELETE FROM Users WHERE user_id = $1 RETURNING user_id`,
-    [id]
+    [maNguoiDung]
   );
-  return result.rowCount > 0;
+  return ketQua.rowCount > 0;
 }
 
 module.exports = {
-  getAllUsers,
-  getUserById,
-  getUserByEmail,
-  createUser,
-  updateUser,
-  updatePassword,
-  setLockStatus,
-  deleteUser,
+  layTatCaNguoiDung,
+  layNguoiDungTheoId,
+  layNguoiDungTheoEmail,
+  taoNguoiDung,
+  capNhatNguoiDung,
+  capNhatMatKhau,
+  datTrangThaiKhoa,
+  xoaNguoiDung,
 };

@@ -2,11 +2,11 @@ const { Pool } = require("pg");
 const fs = require("fs");
 const path = require("path");
 
-// Load biến môi trường từ .env
+// Tai bien moi truong tu .env
 require("dotenv").config();
 
-// Tạo connection pool PostgreSQL
-const pool = new Pool({
+// Tao ket noi pool PostgreSQL
+const ketNoiPool = new Pool({
   host: process.env.DB_HOST || "localhost",
   port: parseInt(process.env.DB_PORT) || 5432,
   user: process.env.DB_USER || "postgres",
@@ -14,54 +14,54 @@ const pool = new Pool({
   database: process.env.DB_NAME || "task_manager",
 });
 
-// Kiểm tra kết nối database
-pool.on("connect", () => {
-  console.log("✅ Đã kết nối PostgreSQL thành công.");
+// Kiem tra ket noi database
+ketNoiPool.on("connect", () => {
+  console.log("✅ Da ket noi PostgreSQL thanh cong.");
 });
 
-pool.on("error", (err) => {
-  console.error("❌ Lỗi kết nối PostgreSQL:", err.message);
+ketNoiPool.on("error", (loi) => {
+  console.error("❌ Loi ket noi PostgreSQL:", loi.message);
 });
 
 /**
- * Khởi tạo database: chạy file init.sql để tạo bảng
+ * Khoi tao database: chay file init.sql de tao bang
  */
-async function initializeDatabase() {
-  const initSQL = fs.readFileSync(
+async function khoiTaoDatabase() {
+  const noiDungSQL = fs.readFileSync(
     path.join(__dirname, "..", "database", "init.sql"),
     "utf8"
   );
 
   try {
-    await pool.query(initSQL);
-    console.log("✅ Đã khởi tạo cấu trúc bảng database thành công.");
-  } catch (error) {
-    console.error("❌ Lỗi khởi tạo database:", error.message);
-    throw error;
+    await ketNoiPool.query(noiDungSQL);
+    console.log("✅ Da khoi tao cau truc bang database thanh cong.");
+  } catch (loi) {
+    console.error("❌ Loi khoi tao database:", loi.message);
+    throw loi;
   }
 }
 
 /**
- * Helper: thực thi query với tham số
- * @param {string} text - Câu lệnh SQL
- * @param {Array} params - Tham số
- * @returns {Object} Kết quả query
+ * Helper: thuc thi truy van voi tham so
+ * @param {string} cauLenh - Cau lenh SQL
+ * @param {Array} thamSo - Tham so
+ * @returns {Object} Ket qua truy van
  */
-async function query(text, params) {
-  const start = Date.now();
-  const result = await pool.query(text, params);
-  const duration = Date.now() - start;
+async function truyVan(cauLenh, thamSo) {
+  const thoiDiemBatDau = Date.now();
+  const ketQua = await ketNoiPool.query(cauLenh, thamSo);
+  const thoiGian = Date.now() - thoiDiemBatDau;
 
-  // Log query trong development
+  // Ghi log truy van trong moi truong phat trien
   if (process.env.NODE_ENV !== "production") {
-    console.log("📝 Query:", { text: text.substring(0, 80), duration: `${duration}ms`, rows: result.rowCount });
+    console.log("📝 Truy van:", { cauLenh: cauLenh.substring(0, 80), thoiGian: `${thoiGian}ms`, soDong: ketQua.rowCount });
   }
 
-  return result;
+  return ketQua;
 }
 
 module.exports = {
-  pool,
-  query,
-  initializeDatabase,
+  ketNoiPool,
+  truyVan,
+  khoiTaoDatabase,
 };

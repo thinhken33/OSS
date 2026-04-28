@@ -1,52 +1,52 @@
 const db = require("../config/db");
 
 /**
- * Lấy tất cả tasks của một người dùng (có kèm tên danh mục)
+ * Lay tat ca cong viec cua mot nguoi dung (co kem ten danh muc)
  */
-async function getTasksByUserId(userId) {
-  const result = await db.query(
+async function layCongViecTheoNguoiDung(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `SELECT t.*, c.name AS category_name
      FROM Tasks t
      LEFT JOIN Categories c ON t.category_id = c.category_id
      WHERE t.user_id = $1
      ORDER BY t.created_at DESC`,
-    [userId]
+    [maNguoiDung]
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Lấy task theo ID
+ * Lay cong viec theo ID
  */
-async function getTaskById(id) {
-  const result = await db.query(
+async function layCongViecTheoId(maCongViec) {
+  const ketQua = await db.truyVan(
     `SELECT t.*, c.name AS category_name
      FROM Tasks t
      LEFT JOIN Categories c ON t.category_id = c.category_id
      WHERE t.task_id = $1`,
-    [id]
+    [maCongViec]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Tạo task mới
+ * Tao cong viec moi
  */
-async function createTask({ user_id, category_id, title, description, start_date, due_date, priority, status }) {
-  const result = await db.query(
+async function taoCongViec({ user_id, category_id, title, description, start_date, due_date, priority, status }) {
+  const ketQua = await db.truyVan(
     `INSERT INTO Tasks (user_id, category_id, title, description, start_date, due_date, priority, status)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING *`,
     [user_id, category_id || null, title, description || null, start_date || null, due_date || null, priority || 'medium', status || 'pending']
   );
-  return result.rows[0];
+  return ketQua.rows[0];
 }
 
 /**
- * Cập nhật task
+ * Cap nhat cong viec
  */
-async function updateTask(id, { category_id, title, description, start_date, due_date, priority, status, completed_at }) {
-  const result = await db.query(
+async function capNhatCongViec(maCongViec, { category_id, title, description, start_date, due_date, priority, status, completed_at }) {
+  const ketQua = await db.truyVan(
     `UPDATE Tasks
      SET category_id = $1,
          title = $2,
@@ -58,139 +58,139 @@ async function updateTask(id, { category_id, title, description, start_date, due
          completed_at = $8
      WHERE task_id = $9
      RETURNING *`,
-    [category_id || null, title, description || null, start_date || null, due_date || null, priority, status, completed_at || null, id]
+    [category_id || null, title, description || null, start_date || null, due_date || null, priority, status, completed_at || null, maCongViec]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Cập nhật trạng thái task
+ * Cap nhat trang thai cong viec
  */
-async function updateTaskStatus(id, status, completed_at) {
-  const result = await db.query(
+async function capNhatTrangThaiCongViec(maCongViec, trangThai, thoiDiemHoanThanh) {
+  const ketQua = await db.truyVan(
     `UPDATE Tasks SET status = $1, completed_at = $2 WHERE task_id = $3 RETURNING *`,
-    [status, completed_at || null, id]
+    [trangThai, thoiDiemHoanThanh || null, maCongViec]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Xóa task
+ * Xoa cong viec
  */
-async function deleteTask(id) {
-  const result = await db.query(
+async function xoaCongViec(maCongViec) {
+  const ketQua = await db.truyVan(
     `DELETE FROM Tasks WHERE task_id = $1 RETURNING task_id`,
-    [id]
+    [maCongViec]
   );
-  return result.rowCount > 0;
+  return ketQua.rowCount > 0;
 }
 
 /**
- * Tìm kiếm và lọc tasks
+ * Tim kiem va loc cong viec
  */
-async function searchTasks(userId, { keyword, status, priority, category_id, due_date }) {
-  let query = `
+async function timKiemCongViec(maNguoiDung, { tuKhoa, trangThai, mucUuTien, maDanhMuc, hanHoanThanh }) {
+  let cauTruyVan = `
     SELECT t.*, c.name AS category_name
     FROM Tasks t
     LEFT JOIN Categories c ON t.category_id = c.category_id
     WHERE t.user_id = $1
   `;
-  const params = [userId];
-  let paramIndex = 2;
+  const thamSo = [maNguoiDung];
+  let chiSoThamSo = 2;
 
-  if (keyword) {
-    query += ` AND (LOWER(t.title) LIKE LOWER($${paramIndex}) OR LOWER(t.description) LIKE LOWER($${paramIndex}))`;
-    params.push(`%${keyword}%`);
-    paramIndex++;
+  if (tuKhoa) {
+    cauTruyVan += ` AND (LOWER(t.title) LIKE LOWER($${chiSoThamSo}) OR LOWER(t.description) LIKE LOWER($${chiSoThamSo}))`;
+    thamSo.push(`%${tuKhoa}%`);
+    chiSoThamSo++;
   }
 
-  if (status) {
-    query += ` AND t.status = $${paramIndex}`;
-    params.push(status);
-    paramIndex++;
+  if (trangThai) {
+    cauTruyVan += ` AND t.status = $${chiSoThamSo}`;
+    thamSo.push(trangThai);
+    chiSoThamSo++;
   }
 
-  if (priority) {
-    query += ` AND t.priority = $${paramIndex}`;
-    params.push(priority);
-    paramIndex++;
+  if (mucUuTien) {
+    cauTruyVan += ` AND t.priority = $${chiSoThamSo}`;
+    thamSo.push(mucUuTien);
+    chiSoThamSo++;
   }
 
-  if (category_id) {
-    query += ` AND t.category_id = $${paramIndex}`;
-    params.push(category_id);
-    paramIndex++;
+  if (maDanhMuc) {
+    cauTruyVan += ` AND t.category_id = $${chiSoThamSo}`;
+    thamSo.push(maDanhMuc);
+    chiSoThamSo++;
   }
 
-  if (due_date) {
-    query += ` AND DATE(t.due_date) = $${paramIndex}`;
-    params.push(due_date);
-    paramIndex++;
+  if (hanHoanThanh) {
+    cauTruyVan += ` AND DATE(t.due_date) = $${chiSoThamSo}`;
+    thamSo.push(hanHoanThanh);
+    chiSoThamSo++;
   }
 
-  query += ` ORDER BY t.due_date ASC NULLS LAST`;
+  cauTruyVan += ` ORDER BY t.due_date ASC NULLS LAST`;
 
-  const result = await db.query(query, params);
-  return result.rows;
+  const ketQua = await db.truyVan(cauTruyVan, thamSo);
+  return ketQua.rows;
 }
 
 /**
- * Lấy tasks sắp đến hạn hoặc quá hạn (dùng cho thông báo)
+ * Lay cong viec sap den han hoac qua han (dung cho thong bao)
  */
-async function getOverdueAndUpcomingTasks(userId) {
-  const result = await db.query(
+async function layCongViecQuaHanVaSapDenHan(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `SELECT * FROM Tasks
      WHERE user_id = $1
        AND status NOT IN ('completed')
        AND due_date IS NOT NULL
        AND due_date <= NOW() + INTERVAL '1 day'
      ORDER BY due_date ASC`,
-    [userId]
+    [maNguoiDung]
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Đánh dấu tự động các task quá hạn
+ * Danh dau tu dong cac cong viec qua han
  */
-async function markOverdueTasks() {
-  const result = await db.query(
+async function danhDauCongViecQuaHan() {
+  const ketQua = await db.truyVan(
     `UPDATE Tasks
      SET status = 'overdue'
      WHERE status IN ('pending', 'in_progress')
        AND due_date < NOW()
      RETURNING *`
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Lấy thống kê tasks của user
+ * Lay thong ke cong viec cua nguoi dung
  */
-async function getTaskStats(userId) {
-  const result = await db.query(
+async function layThongKeCongViec(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `SELECT
-       COUNT(*) AS total,
-       COUNT(*) FILTER (WHERE status = 'pending') AS pending,
-       COUNT(*) FILTER (WHERE status = 'in_progress') AS in_progress,
-       COUNT(*) FILTER (WHERE status = 'completed') AS completed,
-       COUNT(*) FILTER (WHERE status = 'overdue') AS overdue
+       COUNT(*) AS tong,
+       COUNT(*) FILTER (WHERE status = 'pending') AS cho_xu_ly,
+       COUNT(*) FILTER (WHERE status = 'in_progress') AS dang_lam,
+       COUNT(*) FILTER (WHERE status = 'completed') AS hoan_thanh,
+       COUNT(*) FILTER (WHERE status = 'overdue') AS qua_han
      FROM Tasks
      WHERE user_id = $1`,
-    [userId]
+    [maNguoiDung]
   );
-  return result.rows[0];
+  return ketQua.rows[0];
 }
 
 module.exports = {
-  getTasksByUserId,
-  getTaskById,
-  createTask,
-  updateTask,
-  updateTaskStatus,
-  deleteTask,
-  searchTasks,
-  getOverdueAndUpcomingTasks,
-  markOverdueTasks,
-  getTaskStats,
+  layCongViecTheoNguoiDung,
+  layCongViecTheoId,
+  taoCongViec,
+  capNhatCongViec,
+  capNhatTrangThaiCongViec,
+  xoaCongViec,
+  timKiemCongViec,
+  layCongViecQuaHanVaSapDenHan,
+  danhDauCongViecQuaHan,
+  layThongKeCongViec,
 };

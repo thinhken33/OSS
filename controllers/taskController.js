@@ -1,140 +1,140 @@
-const taskService = require("../services/taskService");
+const congViecService = require("../services/taskService");
 
 /**
- * Lấy tất cả tasks của user
+ * Lay tat ca cong viec cua nguoi dung
  */
-async function getTasks(req, res) {
+async function layCongViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const tasks = await taskService.getTasksByUserId(userId);
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ message: error.message || "Không lấy được danh sách công việc." });
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const danhSachCongViec = await congViecService.layCongViecTheoNguoiDung(maNguoiDung);
+    phanHoi.json(danhSachCongViec);
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message || "Khong lay duoc danh sach cong viec." });
   }
 }
 
 /**
- * Lấy task theo ID
+ * Lay cong viec theo ID
  */
-async function getTaskById(req, res) {
+async function layCongViecTheoId(yeuCau, phanHoi) {
   try {
-    const task = await taskService.getTaskById(parseInt(req.params.id));
-    res.json(task);
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+    const congViec = await congViecService.layCongViecTheoId(parseInt(yeuCau.params.id));
+    phanHoi.json(congViec);
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Tạo task mới
+ * Tao cong viec moi
  */
-async function createTask(req, res) {
+async function taoCongViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const task = await taskService.createTask(userId, req.body);
-    res.status(201).json({
-      message: "Tạo công việc thành công.",
-      task,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const congViec = await congViecService.taoCongViec(maNguoiDung, yeuCau.body);
+    phanHoi.status(201).json({
+      message: "Tao cong viec thanh cong.",
+      congViec,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Cập nhật task
+ * Cap nhat cong viec
  */
-async function updateTask(req, res) {
+async function capNhatCongViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const task = await taskService.updateTask(parseInt(req.params.id), userId, req.body);
-    res.json({
-      message: "Cập nhật công việc thành công.",
-      task,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const congViec = await congViecService.capNhatCongViec(parseInt(yeuCau.params.id), maNguoiDung, yeuCau.body);
+    phanHoi.json({
+      message: "Cap nhat cong viec thanh cong.",
+      congViec,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Cập nhật trạng thái task
+ * Cap nhat trang thai cong viec
  */
-async function updateTaskStatus(req, res) {
+async function capNhatTrangThaiCongViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const { status } = req.body;
-    const task = await taskService.updateTaskStatus(parseInt(req.params.id), userId, status);
-    res.json({
-      message: "Cập nhật trạng thái thành công.",
-      task,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const { status } = yeuCau.body;
+    const congViec = await congViecService.capNhatTrangThaiCongViec(parseInt(yeuCau.params.id), maNguoiDung, status);
+    phanHoi.json({
+      message: "Cap nhat trang thai thanh cong.",
+      congViec,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Xóa task
+ * Xoa cong viec
  */
-async function deleteTask(req, res) {
+async function xoaCongViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const task = await taskService.deleteTask(parseInt(req.params.id), userId);
-    res.json({
-      message: "Đã xóa công việc.",
-      task,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const congViec = await congViecService.xoaCongViec(parseInt(yeuCau.params.id), maNguoiDung);
+    phanHoi.json({
+      message: "Da xoa cong viec.",
+      congViec,
     });
-  } catch (error) {
-    const statusCode = error.statusCode || 500;
-    res.status(statusCode).json({ message: error.message });
+  } catch (loi) {
+    const maLoi = loi.statusCode || 500;
+    phanHoi.status(maLoi).json({ message: loi.message });
   }
 }
 
 /**
- * Tìm kiếm và lọc tasks
+ * Tim kiem va loc cong viec
  */
-async function searchTasks(req, res) {
+async function timKiemCongViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const filters = {
-      keyword: req.query.keyword || null,
-      status: req.query.status || null,
-      priority: req.query.priority || null,
-      category_id: req.query.category_id ? parseInt(req.query.category_id) : null,
-      due_date: req.query.due_date || null,
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const boLoc = {
+      tuKhoa: yeuCau.query.keyword || null,
+      trangThai: yeuCau.query.status || null,
+      mucUuTien: yeuCau.query.priority || null,
+      maDanhMuc: yeuCau.query.category_id ? parseInt(yeuCau.query.category_id) : null,
+      hanHoanThanh: yeuCau.query.due_date || null,
     };
-    const tasks = await taskService.searchTasks(userId, filters);
-    res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ message: error.message || "Không tìm kiếm được." });
+    const danhSachCongViec = await congViecService.timKiemCongViec(maNguoiDung, boLoc);
+    phanHoi.json(danhSachCongViec);
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message || "Khong tim kiem duoc." });
   }
 }
 
 /**
- * Lấy thống kê tasks
+ * Lay thong ke cong viec
  */
-async function getTaskStats(req, res) {
+async function layThongKeCongViec(yeuCau, phanHoi) {
   try {
-    const userId = parseInt(req.params.userId);
-    const stats = await taskService.getTaskStats(userId);
-    res.json(stats);
-  } catch (error) {
-    res.status(500).json({ message: error.message || "Không lấy được thống kê." });
+    const maNguoiDung = parseInt(yeuCau.params.userId);
+    const thongKe = await congViecService.layThongKeCongViec(maNguoiDung);
+    phanHoi.json(thongKe);
+  } catch (loi) {
+    phanHoi.status(500).json({ message: loi.message || "Khong lay duoc thong ke." });
   }
 }
 
 module.exports = {
-  getTasks,
-  getTaskById,
-  createTask,
-  updateTask,
-  updateTaskStatus,
-  deleteTask,
-  searchTasks,
-  getTaskStats,
+  layCongViec,
+  layCongViecTheoId,
+  taoCongViec,
+  capNhatCongViec,
+  capNhatTrangThaiCongViec,
+  xoaCongViec,
+  timKiemCongViec,
+  layThongKeCongViec,
 };

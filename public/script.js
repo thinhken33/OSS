@@ -1,383 +1,383 @@
-const API_URL = "/api/tasks";
+const DUONG_DAN_API = "/api/tasks";
 
-const taskList = document.getElementById("taskList");
-const emptyState = document.getElementById("emptyState");
+const danhSachCongViecUI = document.getElementById("taskList");
+const trangThaiRong = document.getElementById("emptyState");
 
-const searchInput = document.getElementById("searchInput");
-const statusFilter = document.getElementById("statusFilter");
-const priorityFilter = document.getElementById("priorityFilter");
-const resetFilterBtn = document.getElementById("resetFilterBtn");
-const toggleFilterBtn = document.getElementById("toggleFilterBtn");
-const filterPanel = document.getElementById("filterPanel");
+const oTimKiem = document.getElementById("searchInput");
+const locTrangThai = document.getElementById("statusFilter");
+const locMucUuTien = document.getElementById("priorityFilter");
+const nutDatLaiBoLoc = document.getElementById("resetFilterBtn");
+const nutMoBoLoc = document.getElementById("toggleFilterBtn");
+const bangBoLoc = document.getElementById("filterPanel");
 
-const tabs = document.querySelectorAll(".tab");
+const danhSachTab = document.querySelectorAll(".tab");
 
-const modalBackdrop = document.getElementById("modalBackdrop");
-const modalTitle = document.getElementById("modalTitle");
-const openAddModalBtn = document.getElementById("openAddModal");
-const closeModalBtn = document.getElementById("closeModal");
-const cancelModalBtn = document.getElementById("cancelModal");
-const taskForm = document.getElementById("taskForm");
+const nenModal = document.getElementById("modalBackdrop");
+const tieuDeModal = document.getElementById("modalTitle");
+const nutMoThemModal = document.getElementById("openAddModal");
+const nutDongModal = document.getElementById("closeModal");
+const nutHuyModal = document.getElementById("cancelModal");
+const bieuMauCongViec = document.getElementById("taskForm");
 
-const taskIdInput = document.getElementById("taskId");
-const taskTitleInput = document.getElementById("taskTitle");
-const taskDescriptionInput = document.getElementById("taskDescription");
-const taskStatusInput = document.getElementById("taskStatus");
-const taskPriorityInput = document.getElementById("taskPriority");
-const taskDueDateInput = document.getElementById("taskDueDate");
+const oMaCongViec = document.getElementById("taskId");
+const oTenCongViec = document.getElementById("taskTitle");
+const oMoTaCongViec = document.getElementById("taskDescription");
+const oTrangThaiCongViec = document.getElementById("taskStatus");
+const oMucUuTienCongViec = document.getElementById("taskPriority");
+const oHanCongViec = document.getElementById("taskDueDate");
 
-let currentTab = "all";
-let tasks = [];
+let tabHienTai = "all";
+let danhSachCongViec = [];
 
-function getTodayString() {
-  const today = new Date();
-  const offset = today.getTimezoneOffset();
-  const local = new Date(today.getTime() - offset * 60000);
-  return local.toISOString().split("T")[0];
+function layNgayHomNay() {
+  const homNay = new Date();
+  const chenhLech = homNay.getTimezoneOffset();
+  const ngayLocal = new Date(homNay.getTime() - chenhLech * 60000);
+  return ngayLocal.toISOString().split("T")[0];
 }
 
-function isOverdue(task) {
-  if (task.status === "completed") return false;
-  return task.dueDate < getTodayString();
+function laQuaHan(congViec) {
+  if (congViec.status === "completed") return false;
+  return congViec.dueDate < layNgayHomNay();
 }
 
-function getDisplayStatus(task) {
-  if (task.status === "completed") return "completed";
-  if (isOverdue(task)) return "overdue";
-  return task.status;
+function layTrangThaiHienThi(congViec) {
+  if (congViec.status === "completed") return "completed";
+  if (laQuaHan(congViec)) return "overdue";
+  return congViec.status;
 }
 
-function getStatusLabel(status) {
+function layNhanTrangThai(trangThai) {
   return {
-    "not-started": "Chưa bắt đầu",
-    "in-progress": "Đang làm",
-    "completed": "Hoàn thành",
-    "overdue": "Quá hạn"
-  }[status];
+    "not-started": "Chua bat dau",
+    "in-progress": "Dang lam",
+    "completed": "Hoan thanh",
+    "overdue": "Qua han"
+  }[trangThai];
 }
 
-function getPriorityLabel(priority) {
+function layNhanMucUuTien(mucUuTien) {
   return {
-    low: "Thấp",
-    medium: "Trung bình",
+    low: "Thap",
+    medium: "Trung binh",
     high: "Cao"
-  }[priority];
+  }[mucUuTien];
 }
 
-function getStatusClass(status) {
+function layLopTrangThai(trangThai) {
   return {
     "not-started": "gray",
     "in-progress": "blue",
     "completed": "green",
     "overdue": "red"
-  }[status];
+  }[trangThai];
 }
 
-function getPriorityClass(priority) {
+function layLopMucUuTien(mucUuTien) {
   return {
     low: "gray",
     medium: "orange",
     high: "red"
-  }[priority];
+  }[mucUuTien];
 }
 
-function getTaskIcon(status) {
+function layBieuTuongCongViec(trangThai) {
   return {
-    "not-started": { symbol: "◯", color: "#777" },
-    "in-progress": { symbol: "▷", color: "#3b82f6" },
-    "completed": { symbol: "✔", color: "#10b981" },
-    "overdue": { symbol: "⚠", color: "#ef4444" }
-  }[status];
+    "not-started": { kyHieu: "◯", mauSac: "#777" },
+    "in-progress": { kyHieu: "▷", mauSac: "#3b82f6" },
+    "completed": { kyHieu: "✔", mauSac: "#10b981" },
+    "overdue": { kyHieu: "⚠", mauSac: "#ef4444" }
+  }[trangThai];
 }
 
-function formatDate(dateString) {
-  if (!dateString) return "Không có hạn";
-  const [year, month, day] = dateString.split("-");
-  return `${day}/${month}/${year}`;
+function dinhDangNgay(chuoiNgay) {
+  if (!chuoiNgay) return "Khong co han";
+  const [nam, thang, ngay] = chuoiNgay.split("-");
+  return `${ngay}/${thang}/${nam}`;
 }
 
-function formatDateLabel(task) {
-  if (!task.dueDate) return "Không có hạn";
-  if (task.dueDate === getTodayString()) return "Hôm nay";
-  return formatDate(task.dueDate);
+function dinhDangNhanNgay(congViec) {
+  if (!congViec.dueDate) return "Khong co han";
+  if (congViec.dueDate === layNgayHomNay()) return "Hom nay";
+  return dinhDangNgay(congViec.dueDate);
 }
 
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text || "";
-  return div.innerHTML;
+function thoatHtml(vanBan) {
+  const the = document.createElement("div");
+  the.textContent = vanBan || "";
+  return the.innerHTML;
 }
 
-async function fetchTasks() {
-  const res = await fetch(API_URL);
-  if (!res.ok) throw new Error("Không tải được dữ liệu.");
-  tasks = await res.json();
+async function taiDanhSachCongViec() {
+  const phanHoi = await fetch(DUONG_DAN_API);
+  if (!phanHoi.ok) throw new Error("Khong tai duoc du lieu.");
+  danhSachCongViec = await phanHoi.json();
 }
 
-function updateSummaryCounts() {
-  const counts = {
-    all: tasks.length,
+function capNhatThongKe() {
+  const soDem = {
+    all: danhSachCongViec.length,
     "not-started": 0,
     "in-progress": 0,
     "completed": 0,
     "overdue": 0
   };
 
-  tasks.forEach((task) => {
-    const status = getDisplayStatus(task);
-    counts[status] += 1;
+  danhSachCongViec.forEach((congViec) => {
+    const trangThai = layTrangThaiHienThi(congViec);
+    soDem[trangThai] += 1;
   });
 
-  document.getElementById("stat-total").textContent = `${counts.all} tổng`;
-  document.getElementById("stat-not-started").textContent = `${counts["not-started"]} chưa bắt đầu`;
-  document.getElementById("stat-in-progress").textContent = `${counts["in-progress"]} đang làm`;
-  document.getElementById("stat-completed").textContent = `${counts["completed"]} xong`;
-  document.getElementById("stat-overdue").textContent = `${counts["overdue"]} quá hạn`;
+  document.getElementById("stat-total").textContent = `${soDem.all} tong`;
+  document.getElementById("stat-not-started").textContent = `${soDem["not-started"]} chua bat dau`;
+  document.getElementById("stat-in-progress").textContent = `${soDem["in-progress"]} dang lam`;
+  document.getElementById("stat-completed").textContent = `${soDem["completed"]} xong`;
+  document.getElementById("stat-overdue").textContent = `${soDem["overdue"]} qua han`;
 
-  tabs.forEach((tab) => {
-    const key = tab.dataset.tab;
-    tab.querySelector("span").textContent = counts[key];
-  });
-}
-
-function getFilteredTasks() {
-  const keyword = searchInput.value.trim().toLowerCase();
-  const selectedStatus = statusFilter.value;
-  const selectedPriority = priorityFilter.value;
-
-  return tasks.filter((task) => {
-    const displayStatus = getDisplayStatus(task);
-
-    const matchTab = currentTab === "all" || displayStatus === currentTab;
-    const matchSearch =
-      task.title.toLowerCase().includes(keyword) ||
-      (task.description || "").toLowerCase().includes(keyword);
-
-    const matchStatus = selectedStatus === "all" || displayStatus === selectedStatus;
-    const matchPriority = selectedPriority === "all" || task.priority === selectedPriority;
-
-    return matchTab && matchSearch && matchStatus && matchPriority;
+  danhSachTab.forEach((tab) => {
+    const khoaTab = tab.dataset.tab;
+    tab.querySelector("span").textContent = soDem[khoaTab];
   });
 }
 
-function renderTasks() {
-  const filteredTasks = getFilteredTasks().sort(
+function layDanhSachDaLoc() {
+  const tuKhoa = oTimKiem.value.trim().toLowerCase();
+  const trangThaiChon = locTrangThai.value;
+  const mucUuTienChon = locMucUuTien.value;
+
+  return danhSachCongViec.filter((congViec) => {
+    const trangThaiHienThi = layTrangThaiHienThi(congViec);
+
+    const khopTab = tabHienTai === "all" || trangThaiHienThi === tabHienTai;
+    const khopTimKiem =
+      congViec.title.toLowerCase().includes(tuKhoa) ||
+      (congViec.description || "").toLowerCase().includes(tuKhoa);
+
+    const khopTrangThai = trangThaiChon === "all" || trangThaiHienThi === trangThaiChon;
+    const khopMucUuTien = mucUuTienChon === "all" || congViec.priority === mucUuTienChon;
+
+    return khopTab && khopTimKiem && khopTrangThai && khopMucUuTien;
+  });
+}
+
+function hienThiDanhSach() {
+  const danhSachDaLoc = layDanhSachDaLoc().sort(
     (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
   );
 
-  if (filteredTasks.length === 0) {
-    taskList.innerHTML = "";
-    emptyState.classList.add("show");
-    updateSummaryCounts();
+  if (danhSachDaLoc.length === 0) {
+    danhSachCongViecUI.innerHTML = "";
+    trangThaiRong.classList.add("show");
+    capNhatThongKe();
     return;
   }
 
-  emptyState.classList.remove("show");
+  trangThaiRong.classList.remove("show");
 
-  taskList.innerHTML = filteredTasks.map((task) => {
-    const displayStatus = getDisplayStatus(task);
-    const statusClass = getStatusClass(displayStatus);
-    const priorityClass = getPriorityClass(task.priority);
-    const icon = getTaskIcon(displayStatus);
-    const dateClass = displayStatus === "overdue" ? "date red-text" : "date";
+  danhSachCongViecUI.innerHTML = danhSachDaLoc.map((congViec) => {
+    const trangThaiHienThi = layTrangThaiHienThi(congViec);
+    const lopTrangThai = layLopTrangThai(trangThaiHienThi);
+    const lopMucUuTien = layLopMucUuTien(congViec.priority);
+    const bieuTuong = layBieuTuongCongViec(trangThaiHienThi);
+    const lopNgay = trangThaiHienThi === "overdue" ? "date red-text" : "date";
 
     return `
-      <article class="task-card ${displayStatus === "overdue" ? "overdue" : ""}">
+      <article class="task-card ${trangThaiHienThi === "overdue" ? "overdue" : ""}">
         <div class="task-row">
           <div class="task-left">
-            <div class="task-icon" style="color:${icon.color}">${icon.symbol}</div>
+            <div class="task-icon" style="color:${bieuTuong.mauSac}">${bieuTuong.kyHieu}</div>
             <div class="task-content">
-              <div class="task-title">${escapeHtml(task.title)}</div>
+              <div class="task-title">${thoatHtml(congViec.title)}</div>
               <div class="task-meta">
-                <span class="pill ${statusClass}">${getStatusLabel(displayStatus)}</span>
-                <span class="pill ${priorityClass}">${getPriorityLabel(task.priority)}</span>
-                <span class="${dateClass}">🗓 ${formatDateLabel(task)}</span>
+                <span class="pill ${lopTrangThai}">${layNhanTrangThai(trangThaiHienThi)}</span>
+                <span class="pill ${lopMucUuTien}">${layNhanMucUuTien(congViec.priority)}</span>
+                <span class="${lopNgay}">🗓 ${dinhDangNhanNgay(congViec)}</span>
               </div>
             </div>
           </div>
 
           <div class="task-actions">
             <div class="action-icons">
-              <button class="action-btn edit-btn" type="button" data-id="${task.id}">✎</button>
-              <button class="action-btn delete-btn" type="button" data-id="${task.id}">🗑</button>
+              <button class="action-btn edit-btn" type="button" data-id="${congViec.id}">✎</button>
+              <button class="action-btn delete-btn" type="button" data-id="${congViec.id}">🗑</button>
             </div>
-            <button class="detail-link toggle-detail-btn" type="button">⌄ Chi tiết</button>
+            <button class="detail-link toggle-detail-btn" type="button">⌄ Chi tiet</button>
           </div>
         </div>
 
-        <div class="task-detail">${escapeHtml(task.description || "Không có mô tả.")}</div>
+        <div class="task-detail">${thoatHtml(congViec.description || "Khong co mo ta.")}</div>
       </article>
     `;
   }).join("");
 
-  updateSummaryCounts();
+  capNhatThongKe();
 }
 
-function openModal(mode, task = null) {
-  modalTitle.textContent = mode === "add" ? "Thêm công việc" : "Sửa công việc";
+function moModal(cheDo, congViec = null) {
+  tieuDeModal.textContent = cheDo === "add" ? "Them cong viec" : "Sua cong viec";
 
-  if (mode === "add") {
-    taskForm.reset();
-    taskIdInput.value = "";
-    taskStatusInput.value = "not-started";
-    taskPriorityInput.value = "medium";
-    taskDueDateInput.value = getTodayString();
-  } else if (task) {
-    taskIdInput.value = task.id;
-    taskTitleInput.value = task.title;
-    taskDescriptionInput.value = task.description || "";
-    taskStatusInput.value = task.status;
-    taskPriorityInput.value = task.priority;
-    taskDueDateInput.value = task.dueDate;
+  if (cheDo === "add") {
+    bieuMauCongViec.reset();
+    oMaCongViec.value = "";
+    oTrangThaiCongViec.value = "not-started";
+    oMucUuTienCongViec.value = "medium";
+    oHanCongViec.value = layNgayHomNay();
+  } else if (congViec) {
+    oMaCongViec.value = congViec.id;
+    oTenCongViec.value = congViec.title;
+    oMoTaCongViec.value = congViec.description || "";
+    oTrangThaiCongViec.value = congViec.status;
+    oMucUuTienCongViec.value = congViec.priority;
+    oHanCongViec.value = congViec.dueDate;
   }
 
-  modalBackdrop.classList.add("show");
+  nenModal.classList.add("show");
 }
 
-function closeModal() {
-  modalBackdrop.classList.remove("show");
-  taskForm.reset();
-  taskIdInput.value = "";
+function dongModal() {
+  nenModal.classList.remove("show");
+  bieuMauCongViec.reset();
+  oMaCongViec.value = "";
 }
 
-async function createTask(taskData) {
-  const res = await fetch(API_URL, {
+async function themCongViec(duLieu) {
+  const phanHoi = await fetch(DUONG_DAN_API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(taskData)
+    body: JSON.stringify(duLieu)
   });
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Không thêm được công việc.");
-  return data;
+  const ketQua = await phanHoi.json();
+  if (!phanHoi.ok) throw new Error(ketQua.message || "Khong them duoc cong viec.");
+  return ketQua;
 }
 
-async function updateTask(id, taskData) {
-  const res = await fetch(`${API_URL}/${id}`, {
+async function suaCongViec(maCongViec, duLieu) {
+  const phanHoi = await fetch(`${DUONG_DAN_API}/${maCongViec}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(taskData)
+    body: JSON.stringify(duLieu)
   });
 
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Không sửa được công việc.");
-  return data;
+  const ketQua = await phanHoi.json();
+  if (!phanHoi.ok) throw new Error(ketQua.message || "Khong sua duoc cong viec.");
+  return ketQua;
 }
 
-async function removeTask(id) {
-  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Không xoá được công việc.");
-  return data;
+async function xoaCongViec(maCongViec) {
+  const phanHoi = await fetch(`${DUONG_DAN_API}/${maCongViec}`, { method: "DELETE" });
+  const ketQua = await phanHoi.json();
+  if (!phanHoi.ok) throw new Error(ketQua.message || "Khong xoa duoc cong viec.");
+  return ketQua;
 }
 
-async function refreshUI() {
-  await fetchTasks();
-  renderTasks();
+async function lamMoiGiaoDien() {
+  await taiDanhSachCongViec();
+  hienThiDanhSach();
 }
 
-openAddModalBtn.addEventListener("click", () => openModal("add"));
-closeModalBtn.addEventListener("click", closeModal);
-cancelModalBtn.addEventListener("click", closeModal);
+nutMoThemModal.addEventListener("click", () => moModal("add"));
+nutDongModal.addEventListener("click", dongModal);
+nutHuyModal.addEventListener("click", dongModal);
 
-modalBackdrop.addEventListener("click", (e) => {
-  if (e.target === modalBackdrop) closeModal();
+nenModal.addEventListener("click", (suKien) => {
+  if (suKien.target === nenModal) dongModal();
 });
 
-taskForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+bieuMauCongViec.addEventListener("submit", async (suKien) => {
+  suKien.preventDefault();
 
-  const id = taskIdInput.value;
-  const taskData = {
-    title: taskTitleInput.value.trim(),
-    description: taskDescriptionInput.value.trim(),
-    status: taskStatusInput.value,
-    priority: taskPriorityInput.value,
-    dueDate: taskDueDateInput.value
+  const maCongViec = oMaCongViec.value;
+  const duLieu = {
+    title: oTenCongViec.value.trim(),
+    description: oMoTaCongViec.value.trim(),
+    status: oTrangThaiCongViec.value,
+    priority: oMucUuTienCongViec.value,
+    dueDate: oHanCongViec.value
   };
 
   try {
-    if (id) {
-      await updateTask(id, taskData);
+    if (maCongViec) {
+      await suaCongViec(maCongViec, duLieu);
     } else {
-      await createTask(taskData);
+      await themCongViec(duLieu);
     }
 
-    closeModal();
-    await refreshUI();
-  } catch (error) {
-    alert(error.message);
+    dongModal();
+    await lamMoiGiaoDien();
+  } catch (loi) {
+    alert(loi.message);
   }
 });
 
-searchInput.addEventListener("input", renderTasks);
-statusFilter.addEventListener("change", renderTasks);
-priorityFilter.addEventListener("change", renderTasks);
+oTimKiem.addEventListener("input", hienThiDanhSach);
+locTrangThai.addEventListener("change", hienThiDanhSach);
+locMucUuTien.addEventListener("change", hienThiDanhSach);
 
-toggleFilterBtn.addEventListener("click", () => {
-  filterPanel.classList.toggle("show");
+nutMoBoLoc.addEventListener("click", () => {
+  bangBoLoc.classList.toggle("show");
 });
 
-resetFilterBtn.addEventListener("click", () => {
-  searchInput.value = "";
-  statusFilter.value = "all";
-  priorityFilter.value = "all";
-  currentTab = "all";
+nutDatLaiBoLoc.addEventListener("click", () => {
+  oTimKiem.value = "";
+  locTrangThai.value = "all";
+  locMucUuTien.value = "all";
+  tabHienTai = "all";
 
-  tabs.forEach((tab) => tab.classList.remove("active"));
+  danhSachTab.forEach((tab) => tab.classList.remove("active"));
   document.querySelector('[data-tab="all"]').classList.add("active");
 
-  renderTasks();
+  hienThiDanhSach();
 });
 
-tabs.forEach((tab) => {
+danhSachTab.forEach((tab) => {
   tab.addEventListener("click", () => {
-    tabs.forEach((item) => item.classList.remove("active"));
+    danhSachTab.forEach((phanTu) => phanTu.classList.remove("active"));
     tab.classList.add("active");
-    currentTab = tab.dataset.tab;
-    renderTasks();
+    tabHienTai = tab.dataset.tab;
+    hienThiDanhSach();
   });
 });
 
-taskList.addEventListener("click", async (e) => {
-  const editBtn = e.target.closest(".edit-btn");
-  const deleteBtn = e.target.closest(".delete-btn");
-  const detailBtn = e.target.closest(".toggle-detail-btn");
+danhSachCongViecUI.addEventListener("click", async (suKien) => {
+  const nutSua = suKien.target.closest(".edit-btn");
+  const nutXoa = suKien.target.closest(".delete-btn");
+  const nutChiTiet = suKien.target.closest(".toggle-detail-btn");
 
-  if (editBtn) {
-    const id = editBtn.dataset.id;
-    const task = tasks.find((item) => item.id === id);
-    if (task) openModal("edit", task);
+  if (nutSua) {
+    const maCongViec = nutSua.dataset.id;
+    const congViec = danhSachCongViec.find((cv) => cv.id === maCongViec);
+    if (congViec) moModal("edit", congViec);
     return;
   }
 
-  if (deleteBtn) {
-    const id = deleteBtn.dataset.id;
-    const task = tasks.find((item) => item.id === id);
-    if (!task) return;
+  if (nutXoa) {
+    const maCongViec = nutXoa.dataset.id;
+    const congViec = danhSachCongViec.find((cv) => cv.id === maCongViec);
+    if (!congViec) return;
 
-    const confirmed = confirm(`Bạn có chắc muốn xoá công việc "${task.title}" không?`);
-    if (!confirmed) return;
+    const xacNhan = confirm(`Ban co chac muon xoa cong viec "${congViec.title}" khong?`);
+    if (!xacNhan) return;
 
     try {
-      await removeTask(id);
-      await refreshUI();
-    } catch (error) {
-      alert(error.message);
+      await xoaCongViec(maCongViec);
+      await lamMoiGiaoDien();
+    } catch (loi) {
+      alert(loi.message);
     }
     return;
   }
 
-  if (detailBtn) {
-    const card = detailBtn.closest(".task-card");
-    const detail = card.querySelector(".task-detail");
-    const isOpen = detail.classList.contains("show");
+  if (nutChiTiet) {
+    const theCard = nutChiTiet.closest(".task-card");
+    const noiDungChiTiet = theCard.querySelector(".task-detail");
+    const dangMo = noiDungChiTiet.classList.contains("show");
 
-    detail.classList.toggle("show");
-    detailBtn.textContent = isOpen ? "⌄ Chi tiết" : "⌃ Chi tiết";
+    noiDungChiTiet.classList.toggle("show");
+    nutChiTiet.textContent = dangMo ? "⌄ Chi tiet" : "⌃ Chi tiet";
   }
 });
 
-refreshUI().catch((error) => {
-  alert(error.message);
+lamMoiGiaoDien().catch((loi) => {
+  alert(loi.message);
 });

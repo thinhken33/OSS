@@ -1,78 +1,78 @@
 const db = require("../config/db");
 
 /**
- * Lấy tất cả danh mục của một người dùng
+ * Lay tat ca danh muc cua mot nguoi dung
  */
-async function getCategoriesByUserId(userId) {
-  const result = await db.query(
+async function layDanhMucTheoNguoiDung(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `SELECT * FROM Categories WHERE user_id = $1 ORDER BY created_at DESC`,
-    [userId]
+    [maNguoiDung]
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Lấy danh mục theo ID
+ * Lay danh muc theo ID
  */
-async function getCategoryById(id) {
-  const result = await db.query(
+async function layDanhMucTheoId(maDanhMuc) {
+  const ketQua = await db.truyVan(
     `SELECT * FROM Categories WHERE category_id = $1`,
-    [id]
+    [maDanhMuc]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Kiểm tra tên danh mục có bị trùng không (trong cùng user)
+ * Kiem tra ten danh muc co bi trung khong (trong cung user)
  */
-async function getCategoryByName(userId, name) {
-  const result = await db.query(
+async function layDanhMucTheoTen(maNguoiDung, tenDanhMuc) {
+  const ketQua = await db.truyVan(
     `SELECT * FROM Categories WHERE user_id = $1 AND LOWER(name) = LOWER($2)`,
-    [userId, name]
+    [maNguoiDung, tenDanhMuc]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Tạo danh mục mới
+ * Tao danh muc moi
  */
-async function createCategory({ user_id, name }) {
-  const result = await db.query(
+async function taoDanhMuc({ user_id, name }) {
+  const ketQua = await db.truyVan(
     `INSERT INTO Categories (user_id, name)
      VALUES ($1, $2)
      RETURNING *`,
     [user_id, name]
   );
-  return result.rows[0];
+  return ketQua.rows[0];
 }
 
 /**
- * Cập nhật danh mục
+ * Cap nhat danh muc
  */
-async function updateCategory(id, { name }) {
-  const result = await db.query(
+async function capNhatDanhMuc(maDanhMuc, { name }) {
+  const ketQua = await db.truyVan(
     `UPDATE Categories SET name = $1 WHERE category_id = $2 RETURNING *`,
-    [name, id]
+    [name, maDanhMuc]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Xóa danh mục
+ * Xoa danh muc
  */
-async function deleteCategory(id) {
-  const result = await db.query(
+async function xoaDanhMuc(maDanhMuc) {
+  const ketQua = await db.truyVan(
     `DELETE FROM Categories WHERE category_id = $1 RETURNING category_id`,
-    [id]
+    [maDanhMuc]
   );
-  return result.rowCount > 0;
+  return ketQua.rowCount > 0;
 }
 
 module.exports = {
-  getCategoriesByUserId,
-  getCategoryById,
-  getCategoryByName,
-  createCategory,
-  updateCategory,
-  deleteCategory,
+  layDanhMucTheoNguoiDung,
+  layDanhMucTheoId,
+  layDanhMucTheoTen,
+  taoDanhMuc,
+  capNhatDanhMuc,
+  xoaDanhMuc,
 };

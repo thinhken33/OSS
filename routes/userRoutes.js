@@ -1,28 +1,28 @@
 const express = require("express");
-const userController = require("../controllers/userController");
+const dieuKhienNguoiDung = require("../controllers/userController");
 
-const router = express.Router();
+const boTuyenDuong = express.Router();
 
-// Đăng ký & Đăng nhập
-router.post("/register", userController.register);
-router.post("/login", userController.login);
+// Dang ky & Dang nhap
+boTuyenDuong.post("/register", dieuKhienNguoiDung.dangKy);
+boTuyenDuong.post("/login", dieuKhienNguoiDung.dangNhap);
 
-// Lấy danh sách tất cả users (Admin)
-router.get("/", userController.getAllUsers);
+// Lay danh sach tat ca nguoi dung (Admin)
+boTuyenDuong.get("/", dieuKhienNguoiDung.layTatCaNguoiDung);
 
-// Lấy thông tin user theo ID
-router.get("/:id", userController.getUserById);
+// Lay thong tin nguoi dung theo ID
+boTuyenDuong.get("/:id", dieuKhienNguoiDung.layNguoiDungTheoId);
 
-// Cập nhật thông tin cá nhân
-router.put("/:id", userController.updateUser);
+// Cap nhat thong tin ca nhan
+boTuyenDuong.put("/:id", dieuKhienNguoiDung.capNhatNguoiDung);
 
-// Đổi mật khẩu
-router.put("/:id/password", userController.changePassword);
+// Doi mat khau
+boTuyenDuong.put("/:id/password", dieuKhienNguoiDung.doiMatKhau);
 
-// Khóa/mở khóa tài khoản (Admin)
-router.patch("/:id/lock", userController.setLockStatus);
+// Khoa/mo khoa tai khoan (Admin)
+boTuyenDuong.patch("/:id/lock", dieuKhienNguoiDung.datTrangThaiKhoa);
 
-// Xóa người dùng
-router.delete("/:id", userController.deleteUser);
+// Xoa nguoi dung
+boTuyenDuong.delete("/:id", dieuKhienNguoiDung.xoaNguoiDung);
 
-module.exports = router;
+module.exports = boTuyenDuong;

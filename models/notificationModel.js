@@ -1,110 +1,110 @@
 const db = require("../config/db");
 
 /**
- * Lấy tất cả thông báo của user
+ * Lay tat ca thong bao cua nguoi dung
  */
-async function getNotificationsByUserId(userId) {
-  const result = await db.query(
+async function layThongBaoTheoNguoiDung(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `SELECT n.*, t.title AS task_title
      FROM Notifications n
      LEFT JOIN Tasks t ON n.task_id = t.task_id
      WHERE n.user_id = $1
      ORDER BY n.created_at DESC`,
-    [userId]
+    [maNguoiDung]
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Lấy thông báo chưa đọc của user
+ * Lay thong bao chua doc cua nguoi dung
  */
-async function getUnreadNotifications(userId) {
-  const result = await db.query(
+async function layThongBaoChuaDoc(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `SELECT n.*, t.title AS task_title
      FROM Notifications n
      LEFT JOIN Tasks t ON n.task_id = t.task_id
      WHERE n.user_id = $1 AND n.is_read = FALSE
      ORDER BY n.created_at DESC`,
-    [userId]
+    [maNguoiDung]
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Đếm số thông báo chưa đọc
+ * Dem so thong bao chua doc
  */
-async function countUnreadNotifications(userId) {
-  const result = await db.query(
-    `SELECT COUNT(*) AS count FROM Notifications WHERE user_id = $1 AND is_read = FALSE`,
-    [userId]
+async function demThongBaoChuaDoc(maNguoiDung) {
+  const ketQua = await db.truyVan(
+    `SELECT COUNT(*) AS so_luong FROM Notifications WHERE user_id = $1 AND is_read = FALSE`,
+    [maNguoiDung]
   );
-  return parseInt(result.rows[0].count);
+  return parseInt(ketQua.rows[0].so_luong);
 }
 
 /**
- * Lấy thông báo theo ID
+ * Lay thong bao theo ID
  */
-async function getNotificationById(id) {
-  const result = await db.query(
+async function layThongBaoTheoId(maThongBao) {
+  const ketQua = await db.truyVan(
     `SELECT * FROM Notifications WHERE notification_id = $1`,
-    [id]
+    [maThongBao]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Tạo thông báo mới
+ * Tao thong bao moi
  */
-async function createNotification({ user_id, task_id, message }) {
-  const result = await db.query(
+async function taoThongBao({ user_id, task_id, message }) {
+  const ketQua = await db.truyVan(
     `INSERT INTO Notifications (user_id, task_id, message)
      VALUES ($1, $2, $3)
      RETURNING *`,
     [user_id, task_id || null, message]
   );
-  return result.rows[0];
+  return ketQua.rows[0];
 }
 
 /**
- * Đánh dấu đã đọc một thông báo
+ * Danh dau da doc mot thong bao
  */
-async function markAsRead(id) {
-  const result = await db.query(
+async function danhDauDaDoc(maThongBao) {
+  const ketQua = await db.truyVan(
     `UPDATE Notifications SET is_read = TRUE WHERE notification_id = $1 RETURNING *`,
-    [id]
+    [maThongBao]
   );
-  return result.rows[0] || null;
+  return ketQua.rows[0] || null;
 }
 
 /**
- * Đánh dấu tất cả thông báo của user là đã đọc
+ * Danh dau tat ca thong bao cua nguoi dung la da doc
  */
-async function markAllAsRead(userId) {
-  const result = await db.query(
+async function danhDauTatCaDaDoc(maNguoiDung) {
+  const ketQua = await db.truyVan(
     `UPDATE Notifications SET is_read = TRUE WHERE user_id = $1 AND is_read = FALSE RETURNING *`,
-    [userId]
+    [maNguoiDung]
   );
-  return result.rows;
+  return ketQua.rows;
 }
 
 /**
- * Xóa thông báo
+ * Xoa thong bao
  */
-async function deleteNotification(id) {
-  const result = await db.query(
+async function xoaThongBao(maThongBao) {
+  const ketQua = await db.truyVan(
     `DELETE FROM Notifications WHERE notification_id = $1 RETURNING notification_id`,
-    [id]
+    [maThongBao]
   );
-  return result.rowCount > 0;
+  return ketQua.rowCount > 0;
 }
 
 module.exports = {
-  getNotificationsByUserId,
-  getUnreadNotifications,
-  countUnreadNotifications,
-  getNotificationById,
-  createNotification,
-  markAsRead,
-  markAllAsRead,
-  deleteNotification,
+  layThongBaoTheoNguoiDung,
+  layThongBaoChuaDoc,
+  demThongBaoChuaDoc,
+  layThongBaoTheoId,
+  taoThongBao,
+  danhDauDaDoc,
+  danhDauTatCaDaDoc,
+  xoaThongBao,
 };

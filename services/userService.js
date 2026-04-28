@@ -1,192 +1,192 @@
-const userModel = require("../models/userModel");
+const nguoiDungModel = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 
-const SALT_ROUNDS = 10;
+const SO_VONG_MA_HOA = 10;
 
-function createError(message, statusCode) {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
+function taoLoi(thongBao, maLoi) {
+  const loi = new Error(thongBao);
+  loi.statusCode = maLoi;
+  return loi;
 }
 
 /**
- * Lấy danh sách tất cả người dùng
+ * Lay danh sach tat ca nguoi dung
  */
-async function getAllUsers() {
-  return await userModel.getAllUsers();
+async function layTatCaNguoiDung() {
+  return await nguoiDungModel.layTatCaNguoiDung();
 }
 
 /**
- * Lấy thông tin người dùng theo ID
+ * Lay thong tin nguoi dung theo ID
  */
-async function getUserById(id) {
-  const user = await userModel.getUserById(id);
-  if (!user) {
-    throw createError("Không tìm thấy người dùng.", 404);
+async function layNguoiDungTheoId(maNguoiDung) {
+  const nguoiDung = await nguoiDungModel.layNguoiDungTheoId(maNguoiDung);
+  if (!nguoiDung) {
+    throw taoLoi("Khong tim thay nguoi dung.", 404);
   }
-  return user;
+  return nguoiDung;
 }
 
 /**
- * Đăng ký tài khoản mới
+ * Dang ky tai khoan moi
  */
-async function registerUser({ full_name, email, password, avatar_url, bio }) {
-  // Validate dữ liệu đầu vào
-  const errors = [];
+async function dangKyNguoiDung({ full_name, email, password, avatar_url, bio }) {
+  // Kiem tra du lieu dau vao
+  const danhSachLoi = [];
 
   if (!full_name || !full_name.trim()) {
-    errors.push("Họ và tên không được để trống.");
+    danhSachLoi.push("Ho va ten khong duoc de trong.");
   }
 
   if (!email || !email.trim()) {
-    errors.push("Email không được để trống.");
+    danhSachLoi.push("Email khong duoc de trong.");
   } else {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      errors.push("Email không đúng định dạng.");
+    const bieuThucEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!bieuThucEmail.test(email)) {
+      danhSachLoi.push("Email khong dung dinh dang.");
     }
   }
 
   if (!password || password.length < 6) {
-    errors.push("Mật khẩu phải có ít nhất 6 ký tự.");
+    danhSachLoi.push("Mat khau phai co it nhat 6 ky tu.");
   }
 
-  if (errors.length) {
-    throw createError(errors.join(" "), 400);
+  if (danhSachLoi.length) {
+    throw taoLoi(danhSachLoi.join(" "), 400);
   }
 
-  // Kiểm tra email đã tồn tại
-  const existingUser = await userModel.getUserByEmail(email.trim());
-  if (existingUser) {
-    throw createError("Email đã được sử dụng.", 409);
+  // Kiem tra email da ton tai
+  const nguoiDungTonTai = await nguoiDungModel.layNguoiDungTheoEmail(email.trim());
+  if (nguoiDungTonTai) {
+    throw taoLoi("Email da duoc su dung.", 409);
   }
 
-  // Hash mật khẩu
-  const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+  // Ma hoa mat khau
+  const matKhauHash = await bcrypt.hash(password, SO_VONG_MA_HOA);
 
-  // Tạo user mới
-  const newUser = await userModel.createUser({
+  // Tao nguoi dung moi
+  const nguoiDungMoi = await nguoiDungModel.taoNguoiDung({
     full_name: full_name.trim(),
     email: email.trim().toLowerCase(),
-    password_hash,
+    password_hash: matKhauHash,
     avatar_url: avatar_url || null,
     bio: bio || null,
   });
 
-  return newUser;
+  return nguoiDungMoi;
 }
 
 /**
- * Đăng nhập
+ * Dang nhap
  */
-async function loginUser({ email, password }) {
+async function dangNhap({ email, password }) {
   if (!email || !password) {
-    throw createError("Email và mật khẩu không được để trống.", 400);
+    throw taoLoi("Email va mat khau khong duoc de trong.", 400);
   }
 
-  const user = await userModel.getUserByEmail(email.trim().toLowerCase());
+  const nguoiDung = await nguoiDungModel.layNguoiDungTheoEmail(email.trim().toLowerCase());
 
-  if (!user) {
-    throw createError("Email hoặc mật khẩu không đúng.", 401);
+  if (!nguoiDung) {
+    throw taoLoi("Email hoac mat khau khong dung.", 401);
   }
 
-  if (user.is_locked) {
-    throw createError("Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.", 403);
+  if (nguoiDung.is_locked) {
+    throw taoLoi("Tai khoan da bi khoa. Vui long lien he quan tri vien.", 403);
   }
 
-  const isMatch = await bcrypt.compare(password, user.password_hash);
-  if (!isMatch) {
-    throw createError("Email hoặc mật khẩu không đúng.", 401);
+  const matKhauKhop = await bcrypt.compare(password, nguoiDung.password_hash);
+  if (!matKhauKhop) {
+    throw taoLoi("Email hoac mat khau khong dung.", 401);
   }
 
-  // Trả về user không có password_hash
-  const { password_hash, ...userWithoutPassword } = user;
-  return userWithoutPassword;
+  // Tra ve nguoi dung khong co password_hash
+  const { password_hash, ...nguoiDungKhongMatKhau } = nguoiDung;
+  return nguoiDungKhongMatKhau;
 }
 
 /**
- * Cập nhật thông tin cá nhân
+ * Cap nhat thong tin ca nhan
  */
-async function updateUser(id, { full_name, avatar_url, bio }) {
+async function capNhatNguoiDung(maNguoiDung, { full_name, avatar_url, bio }) {
   if (!full_name || !full_name.trim()) {
-    throw createError("Họ và tên không được để trống.", 400);
+    throw taoLoi("Ho va ten khong duoc de trong.", 400);
   }
 
-  const user = await userModel.updateUser(id, {
+  const nguoiDung = await nguoiDungModel.capNhatNguoiDung(maNguoiDung, {
     full_name: full_name.trim(),
     avatar_url,
     bio,
   });
 
-  if (!user) {
-    throw createError("Không tìm thấy người dùng để cập nhật.", 404);
+  if (!nguoiDung) {
+    throw taoLoi("Khong tim thay nguoi dung de cap nhat.", 404);
   }
 
-  return user;
+  return nguoiDung;
 }
 
 /**
- * Đổi mật khẩu
+ * Doi mat khau
  */
-async function changePassword(id, { current_password, new_password }) {
+async function doiMatKhau(maNguoiDung, { current_password, new_password }) {
   if (!current_password || !new_password) {
-    throw createError("Mật khẩu hiện tại và mật khẩu mới không được để trống.", 400);
+    throw taoLoi("Mat khau hien tai va mat khau moi khong duoc de trong.", 400);
   }
 
   if (new_password.length < 6) {
-    throw createError("Mật khẩu mới phải có ít nhất 6 ký tự.", 400);
+    throw taoLoi("Mat khau moi phai co it nhat 6 ky tu.", 400);
   }
 
-  // Lấy user có password_hash
-  const user = await userModel.getUserById(id);
-  if (!user) {
-    throw createError("Không tìm thấy người dùng.", 404);
+  // Lay nguoi dung co password_hash
+  const nguoiDung = await nguoiDungModel.layNguoiDungTheoId(maNguoiDung);
+  if (!nguoiDung) {
+    throw taoLoi("Khong tim thay nguoi dung.", 404);
   }
 
-  // Lấy full user (có password_hash) qua email
-  const fullUser = await userModel.getUserByEmail(user.email);
-  const isMatch = await bcrypt.compare(current_password, fullUser.password_hash);
-  if (!isMatch) {
-    throw createError("Mật khẩu hiện tại không đúng.", 401);
+  // Lay full nguoi dung (co password_hash) qua email
+  const nguoiDungDayDu = await nguoiDungModel.layNguoiDungTheoEmail(nguoiDung.email);
+  const matKhauKhop = await bcrypt.compare(current_password, nguoiDungDayDu.password_hash);
+  if (!matKhauKhop) {
+    throw taoLoi("Mat khau hien tai khong dung.", 401);
   }
 
-  const password_hash = await bcrypt.hash(new_password, SALT_ROUNDS);
-  await userModel.updatePassword(id, password_hash);
+  const matKhauHash = await bcrypt.hash(new_password, SO_VONG_MA_HOA);
+  await nguoiDungModel.capNhatMatKhau(maNguoiDung, matKhauHash);
 
-  return { message: "Đổi mật khẩu thành công." };
+  return { message: "Doi mat khau thanh cong." };
 }
 
 /**
- * Khóa/mở khóa tài khoản (Admin)
+ * Khoa/mo khoa tai khoan (Admin)
  */
-async function setLockStatus(id, is_locked) {
-  const user = await userModel.setLockStatus(id, is_locked);
-  if (!user) {
-    throw createError("Không tìm thấy người dùng.", 404);
+async function datTrangThaiKhoa(maNguoiDung, daKhoa) {
+  const nguoiDung = await nguoiDungModel.datTrangThaiKhoa(maNguoiDung, daKhoa);
+  if (!nguoiDung) {
+    throw taoLoi("Khong tim thay nguoi dung.", 404);
   }
-  return user;
+  return nguoiDung;
 }
 
 /**
- * Xóa người dùng
+ * Xoa nguoi dung
  */
-async function deleteUser(id) {
-  const user = await userModel.getUserById(id);
-  if (!user) {
-    throw createError("Không tìm thấy người dùng để xóa.", 404);
+async function xoaNguoiDung(maNguoiDung) {
+  const nguoiDung = await nguoiDungModel.layNguoiDungTheoId(maNguoiDung);
+  if (!nguoiDung) {
+    throw taoLoi("Khong tim thay nguoi dung de xoa.", 404);
   }
 
-  await userModel.deleteUser(id);
-  return user;
+  await nguoiDungModel.xoaNguoiDung(maNguoiDung);
+  return nguoiDung;
 }
 
 module.exports = {
-  getAllUsers,
-  getUserById,
-  registerUser,
-  loginUser,
-  updateUser,
-  changePassword,
-  setLockStatus,
-  deleteUser,
+  layTatCaNguoiDung,
+  layNguoiDungTheoId,
+  dangKyNguoiDung,
+  dangNhap,
+  capNhatNguoiDung,
+  doiMatKhau,
+  datTrangThaiKhoa,
+  xoaNguoiDung,
 };
