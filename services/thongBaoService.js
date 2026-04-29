@@ -132,6 +132,10 @@ async function taoThongBaoNhacViec(maNguoiDung) {
     if (hanHoanThanh < bayGio) {
       noiDung = `Công việc "${congViec.title}" đã quá hạn!`;
     } else {
+      // Không thông báo "sắp đến hạn" nếu công việc chưa bắt đầu
+      if (!congViec.start_date || new Date(congViec.start_date) > bayGio) {
+        continue;
+      }
       noiDung = `Công việc "${congViec.title}" sắp đến hạn (${hanHoanThanh.toLocaleDateString("vi-VN")}).`;
     }
 

@@ -62,17 +62,3 @@ CREATE INDEX IF NOT EXISTS idx_tasks_due_date ON Tasks(due_date);
 CREATE INDEX IF NOT EXISTS idx_categories_user_id ON Categories(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON Notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON Notifications(is_read);
-
--- =============================================
--- Dữ liệu mẫu (Seed Data)
--- Mật khẩu mặc định cho tất cả các user mẫu là: 123456
--- (Hash bcrypt của 123456: $2a$10$wYOM5.31Xn7N/1Qd3L.ZQu.4O2/U.6X.L3.z1h/pZ/H1d8L8c2qO6)
--- =============================================
-
-INSERT INTO Users (full_name, email, password_hash, role)
-VALUES 
-  ('Quản trị viên', 'admin@example.com', '$2a$10$wYOM5.31Xn7N/1Qd3L.ZQu.4O2/U.6X.L3.z1h/pZ/H1d8L8c2qO6', 'admin'),
-  ('Người dùng Một', 'user1@example.com', '$2a$10$wYOM5.31Xn7N/1Qd3L.ZQu.4O2/U.6X.L3.z1h/pZ/H1d8L8c2qO6', 'user'),
-  ('Người dùng Hai', 'user2@example.com', '$2a$10$wYOM5.31Xn7N/1Qd3L.ZQu.4O2/U.6X.L3.z1h/pZ/H1d8L8c2qO6', 'user'),
-  ('Người dùng Ba', 'user3@example.com', '$2a$10$wYOM5.31Xn7N/1Qd3L.ZQu.4O2/U.6X.L3.z1h/pZ/H1d8L8c2qO6', 'user')
-ON CONFLICT (email) DO NOTHING;

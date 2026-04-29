@@ -191,6 +191,7 @@ async function danhDauCongViecQuaHan() {
     `UPDATE Tasks
      SET status = 'overdue'
      WHERE status IN ('pending', 'in_progress')
+       AND due_date IS NOT NULL
        AND due_date < NOW()
      RETURNING *`
   );

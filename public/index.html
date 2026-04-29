@@ -1,15 +1,124 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TaskFlow — Quản lý công việc cá nhân</title>
-  <meta name="description" content="Ứng dụng web quản lý công việc cá nhân — lập kế hoạch, theo dõi tiến độ, nhắc hạn và thống kê hiệu quả làm việc." />
+  <meta name="description"
+    content="Ứng dụng web quản lý công việc cá nhân — lập kế hoạch, theo dõi tiến độ, nhắc hạn và thống kê hiệu quả làm việc." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=3" />
+  <style>
+    /* ===== CUSTOM DATE-TIME PICKER ===== */
+    .dtp-wrap { position: relative; }
+    .dtp-display {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; border: 1px solid #000;
+      border-radius: 0; padding: 10px 14px; cursor: pointer;
+      font-size: 0.95rem; color: #000;
+      min-height: 42px;
+    }
+    .dtp-display:hover, .dtp-display.open { border-color: #000; box-shadow: 2px 2px 0 #000; }
+    .dtp-display .dtp-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .dtp-display .dtp-val { flex: 1; }
+    .dtp-display .dtp-placeholder { color: #888; }
+    .dtp-panel {
+      display: none; position: absolute; z-index: 9999; bottom: calc(100% + 4px); top: auto; left: 0;
+      background: #fff; border: 1px solid #000;
+      border-radius: 0; padding: 16px;
+      box-shadow: 4px 4px 0 #000;
+      width: 310px;
+    }
+    .dtp-panel.open { display: block; }
+    .dtp-wrap:has(.dtp-panel.open) { z-index: 9999; }
+    /* Tháng điều hướng */
+    .dtp-cal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; padding-bottom: 8px;
+      border-bottom: 1px solid #000;
+    }
+    .dtp-cal-head span { font-weight: 700; font-size: 0.95rem; color: #000; }
+    .dtp-nav {
+      background: #fff; border: 1px solid #000; color: #000;
+      font-size: 1rem; cursor: pointer; padding: 3px 10px;
+      font-weight: 700; line-height: 1;
+    }
+    .dtp-nav:hover { background: #000; color: #fff; }
+    /* Lưới lịch */
+    .dtp-cal-grid {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 2px;
+      margin-bottom: 12px;
+    }
+    .dtp-dow {
+      text-align: center; font-size: 0.68rem; font-weight: 700;
+      color: #666; padding: 4px 0;
+    }
+    .dtp-day {
+      text-align: center; padding: 6px 2px;
+      font-size: 0.82rem; cursor: pointer; color: #000;
+      border: 1px solid transparent; background: #fff;
+    }
+    .dtp-day:hover:not(:disabled) { background: #f0f0f0; border-color: #000; }
+    .dtp-day.today { font-weight: 700; border-color: #000; }
+    .dtp-day.selected { background: #000 !important; color: #fff !important; font-weight: 700; }
+    .dtp-day.other-month { color: #ccc; }
+    .dtp-day:disabled { color: #ccc !important; cursor: not-allowed !important; text-decoration: line-through; }
+    /* Phần chọn giờ */
+    .dtp-time-block {
+      border-top: 1px solid #000; padding-top: 12px; margin-bottom: 12px;
+    }
+    .dtp-time-title {
+      font-size: 0.75rem; color: #555; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+    }
+    .dtp-time-row {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .dtp-time-col {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .dtp-time-col-label {
+      font-size: 0.68rem; color: #888; font-weight: 600;
+    }
+    .dtp-panel input.dtp-time-num {
+      width: 64px; border: 1px solid #000; background: #fff;
+      color: #000; font-size: 1.5rem; font-weight: 700;
+      text-align: center; padding: 0; height: 42px; line-height: 42px;
+      -moz-appearance: textfield; appearance: textfield;
+      margin: 0;
+    }
+    .dtp-panel input.dtp-time-num.invalid { border-color: #ef4444 !important; color: #ef4444; background: #fef2f2; }
+    .dtp-panel input.dtp-time-num::-webkit-inner-spin-button,
+    .dtp-panel input.dtp-time-num::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .dtp-panel input.dtp-time-num:focus { outline: none; box-shadow: 2px 2px 0 #000; }
+    .dtp-time-err { color: #ef4444; font-size: 0.7rem; font-weight: 600; text-align: center; min-height: 14px; margin-top: 6px; }
+    .dtp-time-sep {
+      color: #000; font-weight: 900; font-size: 1.5rem;
+      user-select: none; padding-top: 18px;
+    }
+    /* Actions */
+    .dtp-actions {
+      display: flex; gap: 8px;
+    }
+    .dtp-btn-ok {
+      flex: 1; background: #000; color: #fff; border: 1px solid #000;
+      padding: 9px; font-weight: 700; cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .dtp-btn-ok:hover { background: #333; }
+    .dtp-btn-clear {
+      background: #fff; color: #000; border: 1px solid #000;
+      padding: 9px 14px; font-size: 0.9rem; cursor: pointer; font-weight: 600;
+    }
+    .dtp-btn-clear:hover { background: #f0f0f0; }
+    .dtp-wrap.right-align .dtp-panel { left: auto; right: 0; }
+  </style>
 </head>
+
 <body>
 
   <!-- ===== TRANG CHỦ (CHƯA ĐĂNG NHẬP) ===== -->
@@ -30,8 +139,9 @@
     <section class="hero-section">
       <div class="hero-content">
         <div class="hero-badge">✨ Quản lý công việc thông minh</div>
-        <h1 class="hero-title">Sắp xếp cuộc sống.<br/><span class="hero-highlight">Hoàn thành mục tiêu.</span></h1>
-        <p class="hero-subtitle">TaskFlow giúp bạn lập kế hoạch, theo dõi tiến độ và hoàn thành công việc hiệu quả hơn mỗi ngày. Đơn giản, trực quan, hoàn toàn miễn phí.</p>
+        <h1 class="hero-title">Sắp xếp cuộc sống.<br /><span class="hero-highlight">Hoàn thành mục tiêu.</span></h1>
+        <p class="hero-subtitle">TaskFlow giúp bạn lập kế hoạch, theo dõi tiến độ và hoàn thành công việc hiệu quả hơn
+          mỗi ngày. Đơn giản, trực quan, hoàn toàn miễn phí.</p>
         <div class="hero-cta">
           <button class="btn-accent btn-lg" id="nutBatDauNgay" type="button">Bắt đầu ngay →</button>
         </div>
@@ -167,10 +277,12 @@
       <ul class="sidebar-menu">
         <li><button class="menu-item active" data-page="congViec" type="button">📝 Công việc</button></li>
         <li><button class="menu-item" data-page="danhMuc" type="button">🗂️ Danh mục</button></li>
-        <li><button class="menu-item" data-page="thongBao" type="button">🔔 Thông báo <span id="badgeThongBao" class="menu-badge" style="display:none;">0</span></button></li>
+        <li><button class="menu-item" data-page="thongBao" type="button">🔔 Thông báo <span id="badgeThongBao"
+              class="menu-badge" style="display:none;">0</span></button></li>
         <li><button class="menu-item" data-page="thongKe" type="button">📊 Thống kê</button></li>
         <li><button class="menu-item" data-page="caNhan" type="button">👤 Cá nhân</button></li>
-        <li id="menuAdmin" style="display:none;"><button class="menu-item" data-page="quanTri" type="button">🛡️ Quản trị</button></li>
+        <li id="menuAdmin" style="display:none;"><button class="menu-item" data-page="quanTri" type="button">🛡️ Quản
+            trị</button></li>
       </ul>
 
       <div class="sidebar-footer">
@@ -190,18 +302,19 @@
         <div class="page-header">
           <div>
             <h1>Công việc của tôi</h1>
-            <div class="stats" id="thongKeCongViec">
-              <span id="stat-total">0 tổng</span>
-              <span id="stat-not-started">0 chưa bắt đầu</span>
-              <span id="stat-in-progress">0 đang làm</span>
-              <span id="stat-completed">0 xong</span>
-              <span id="stat-overdue" class="danger">0 quá hạn</span>
-            </div>
           </div>
           <button class="add-btn" id="openAddModal" type="button">
             <span>＋</span>
             <span>Thêm công việc</span>
           </button>
+        </div>
+
+        <!-- Tiêu điểm (Focus Mode) -->
+        <div id="focusModeContainer" style="display: none; margin-bottom: 24px; background: #fff5f5; border: 2px solid #ef4444; border-radius: 14px; padding: 16px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);">
+          <h2 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #ef4444; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+            <span style="font-size: 1.2rem;">🎯</span> VIỆC CẦN LÀM NGAY
+          </h2>
+          <div id="focusTaskCard"></div>
         </div>
 
         <section class="toolbar">
@@ -282,7 +395,6 @@
           <h1>Thông báo</h1>
           <div class="page-actions">
             <button class="btn-secondary" id="nutDocTatCa" type="button">Đánh dấu tất cả đã đọc</button>
-            <button class="btn-primary" id="nutTaoNhacViec" type="button">🔔 Tạo nhắc việc</button>
           </div>
         </div>
         <div class="tb-list" id="danhSachThongBao"></div>
@@ -331,43 +443,46 @@
         <div class="page-header">
           <h1>Thông tin cá nhân</h1>
         </div>
-        <div class="profile-card">
-          <div class="profile-avatar" id="avatarCaNhan">K</div>
-          <form id="formCaNhan" class="profile-form">
-            <div class="form-group">
-              <label for="cnHoTen">Họ và tên</label>
-              <input type="text" id="cnHoTen" required />
-            </div>
-            <div class="form-group">
-              <label for="cnEmail">Email</label>
-              <input type="email" id="cnEmail" disabled />
-            </div>
-            <div class="form-group">
-              <label for="cnMoTa">Mô tả bản thân</label>
-              <textarea id="cnMoTa" rows="3" placeholder="Viết gì đó về bản thân..."></textarea>
-            </div>
-            <div id="loiCaNhan" class="error-msg"></div>
-            <button type="submit" class="btn-primary">Lưu thay đổi</button>
-          </form>
-        </div>
-        <div class="profile-card" style="margin-top:20px;">
-          <h2>Đổi mật khẩu</h2>
-          <form id="formDoiMatKhau" class="profile-form">
-            <div class="form-group">
-              <label for="mkHienTai">Mật khẩu hiện tại</label>
-              <input type="password" id="mkHienTai" required />
-            </div>
-            <div class="form-group">
-              <label for="mkMoi">Mật khẩu mới</label>
-              <input type="password" id="mkMoi" required minlength="6" />
-            </div>
-            <div class="form-group">
-              <label for="mkXacNhan">Xác nhận mật khẩu mới</label>
-              <input type="password" id="mkXacNhan" required />
-            </div>
-            <div id="loiDoiMK" class="error-msg"></div>
-            <button type="submit" class="btn-primary">Đổi mật khẩu</button>
-          </form>
+        <div class="profile-grid">
+          <div class="profile-card">
+            <div class="profile-avatar" id="avatarCaNhan">K</div>
+            <form id="formCaNhan" class="profile-form">
+              <div class="form-group">
+                <label for="cnHoTen">Họ và tên</label>
+                <input type="text" id="cnHoTen" required />
+              </div>
+              <div class="form-group">
+                <label for="cnEmail">Email</label>
+                <input type="email" id="cnEmail" disabled />
+              </div>
+              <div class="form-group">
+                <label for="cnMoTa">Mô tả bản thân</label>
+                <textarea id="cnMoTa" rows="3" placeholder="Viết gì đó về bản thân..."></textarea>
+              </div>
+              <div id="loiCaNhan" class="error-msg"></div>
+              <button type="submit" class="btn-primary">Lưu thay đổi</button>
+            </form>
+          </div>
+
+          <div class="profile-card">
+            <h2>Đổi mật khẩu</h2>
+            <form id="formDoiMatKhau" class="profile-form">
+              <div class="form-group">
+                <label for="mkHienTai">Mật khẩu hiện tại</label>
+                <input type="password" id="mkHienTai" required />
+              </div>
+              <div class="form-group">
+                <label for="mkMoi">Mật khẩu mới</label>
+                <input type="password" id="mkMoi" required minlength="6" />
+              </div>
+              <div class="form-group">
+                <label for="mkXacNhan">Xác nhận mật khẩu mới</label>
+                <input type="password" id="mkXacNhan" required />
+              </div>
+              <div id="loiDoiMK" class="error-msg"></div>
+              <button type="submit" class="btn-primary">Đổi mật khẩu</button>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -414,38 +529,44 @@
             <label for="taskDescription">Mô tả</label>
             <textarea id="taskDescription" placeholder="Nhập mô tả công việc"></textarea>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="taskStatus">Trạng thái</label>
-              <select id="taskStatus">
-                <option value="not-started">Chưa bắt đầu</option>
-                <option value="in-progress">Đang làm</option>
-                <option value="completed">Hoàn thành</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="taskPriority">Mức ưu tiên</label>
-              <select id="taskPriority">
-                <option value="low">Thấp</option>
-                <option value="medium">Trung bình</option>
-                <option value="high">Cao</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label for="taskPriority">Mức ưu tiên</label>
+            <select id="taskPriority">
+              <option value="low">Thấp</option>
+              <option value="medium">Trung bình</option>
+              <option value="high">Cao</option>
+            </select>
           </div>
+          <!-- Trạng thái được tính tự động — hidden inputs lưu giá trị -->
+          <input type="hidden" id="taskStatus" value="pending" />
           <div class="form-row">
             <div class="form-group">
-              <label for="taskStartDate">Ngày bắt đầu</label>
-              <input type="date" id="taskStartDate" />
+              <label>Bắt đầu <span style="color:#ef4444">*</span></label>
+              <div class="dtp-wrap" id="dtpStartWrap">
+                <div class="dtp-display" id="dtpStartDisplay" tabindex="0">
+                  <span class="dtp-icon">📅</span>
+                  <span class="dtp-val" id="dtpStartVal"><span class="dtp-placeholder">Chưa chọn</span></span>
+                </div>
+                <div class="dtp-panel" id="dtpStartPanel"></div>
+              </div>
+              <input type="hidden" id="taskStartDate" />
             </div>
             <div class="form-group">
-              <label for="taskDueDate">Hạn hoàn thành</label>
-              <input type="date" id="taskDueDate" required />
+              <label>Hạn hoàn thành <span style="color:#ef4444">*</span></label>
+              <div class="dtp-wrap" id="dtpDueWrap">
+                <div class="dtp-display" id="dtpDueDisplay" tabindex="0">
+                  <span class="dtp-icon">📅</span>
+                  <span class="dtp-val" id="dtpDueVal"><span class="dtp-placeholder">Chưa chọn</span></span>
+                </div>
+                <div class="dtp-panel" id="dtpDuePanel"></div>
+              </div>
+              <input type="hidden" id="taskDueDate" />
             </div>
           </div>
           <div class="form-group">
             <label for="taskCategory">Danh mục</label>
             <select id="taskCategory">
-              <option value="">-- Không chọn --</option>
+              <option value=""></option>
             </select>
           </div>
         </div>
@@ -460,6 +581,7 @@
   <!-- ===== TOAST THÔNG BÁO ===== -->
   <div id="toastContainer" class="toast-container"></div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=2"></script>
 </body>
+
 </html>
