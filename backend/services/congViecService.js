@@ -1,7 +1,7 @@
 const congViecModel = require("../models/congViecModel");
 const danhMucModel = require("../models/danhMucModel");
 
-const TRANG_THAI_HOP_LE = ["pending", "in_progress", "completed", "overdue"];
+const TRANG_THAI_NGUOI_DUNG_HOP_LE = ["pending", "in_progress", "completed"];
 const MUC_UU_TIEN_HOP_LE = ["low", "medium", "high"];
 const MOC_NHAC_HOP_LE = [0, 30, 60];
 
@@ -128,7 +128,7 @@ function kiemTraDuLieuCongViec(duLieu) {
     danhSachLoi.push("Ten cong viec khong duoc de trong.");
   }
 
-  if (!TRANG_THAI_HOP_LE.includes(duLieu.status)) {
+  if (!TRANG_THAI_NGUOI_DUNG_HOP_LE.includes(duLieu.status)) {
     danhSachLoi.push("Trang thai khong hop le.");
   }
 
@@ -225,7 +225,9 @@ async function capNhatCongViec(maCongViec, maNguoiDung, duLieuCongViec) {
     start_date: congViecCu.start_date || null,
     due_date: congViecCu.due_date || null,
     priority: congViecCu.priority,
-    status: congViecCu.status,
+    status: TRANG_THAI_NGUOI_DUNG_HOP_LE.includes(congViecCu.status)
+      ? congViecCu.status
+      : suyRaTrangThaiDangLamMacDinh(congViecCu.start_date),
     category_id: congViecCu.category_id || null,
     reminder_minutes: congViecCu.reminder_minutes ?? 0,
   });
@@ -287,12 +289,8 @@ async function capNhatCongViec(maCongViec, maNguoiDung, duLieuCongViec) {
 }
 
 async function capNhatTrangThaiCongViec(maCongViec, maNguoiDung, trangThai) {
-  if (!TRANG_THAI_HOP_LE.includes(trangThai)) {
+  if (!TRANG_THAI_NGUOI_DUNG_HOP_LE.includes(trangThai)) {
     throw taoLoi("Trang thai khong hop le.", 400);
-  }
-
-  if (trangThai === "overdue") {
-    throw taoLoi("Trang thai qua han duoc he thong tu dong cap nhat.", 400);
   }
 
   const congViec = await congViecModel.layCongViecTheoId(maCongViec);

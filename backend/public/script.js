@@ -512,6 +512,12 @@ function layTrangThaiFE(cv) {
   if (cv.start_date && new Date(cv.start_date) <= new Date()) return "in-progress";
   return "not-started";
 }
+function layTrangThaiNguoiDung(cv) {
+  if (!cv || !cv.status) return "pending";
+  if (cv.status === "completed") return "completed";
+  if (cv.status === "in_progress" || cv.status === "pending") return cv.status;
+  return cv.start_date && new Date(cv.start_date) <= new Date() ? "in_progress" : "pending";
+}
 function nhanTrangThai(s) { return { "not-started": "Chưa bắt đầu", "in-progress": "Đang làm", "completed": "Hoàn thành", "overdue": "Quá hạn" }[s] || s; }
 function nhanUuTien(p) { return { low: "Thấp", medium: "Trung bình", high: "Cao" }[p] || p; }
 function lopTrangThai(s) { return { "not-started": "gray", "in-progress": "blue", "completed": "green", "overdue": "red" }[s]; }
@@ -633,6 +639,7 @@ async function taiCongViec() {
     }
   } catch { danhSachCongViec = []; }
   hienThiCongViec();
+  taiThongKe();
 }
 
 function capNhatSoDem() {
@@ -834,7 +841,7 @@ function moModalCongViec(cheDo, cv = null) {
     $("taskId").value = cv.task_id;
     $("taskTitle").value = cv.title;
     $("taskDescription").value = cv.description || "";
-    $("taskStatus").value = cv.status; // giữ status gốc từ BE
+    $("taskStatus").value = layTrangThaiNguoiDung(cv);
     $("taskPriority").value = cv.priority;
     $("taskReminder").value = String(cv.reminder_minutes ?? 0);
     $("taskCategory").value = cv.category_id || "";
@@ -878,10 +885,10 @@ $("taskForm").addEventListener("submit", async e => {
   const title = $("taskTitle").value.trim();
   const startDate = $("taskStartDate").value; // "YYYY-MM-DDTHH:MM"
   const dueDate = $("taskDueDate").value;
-  const statusGuiLen = id ? $("taskStatus").value : "pending";
+  const statusGuiLen = $("taskStatus").value || "pending";
   const priorityGuiLen = $("taskPriority").value;
   const reminderGuiLen = $("taskReminder").value;
-  const trangThaiHopLe = ["pending", "in_progress", "completed", "overdue"];
+  const trangThaiHopLe = ["pending", "in_progress", "completed"];
   const mucUuTienHopLe = ["low", "medium", "high"];
   const mocNhacHopLe = ["0", "30", "60"];
 
@@ -932,7 +939,8 @@ $("taskForm").addEventListener("submit", async e => {
     return;
   }
 
-  // Trạng thái luôn do hệ thống tính: tạo mới = pending, sửa giữ nguyên status gốc
+  // Người dùng chỉ đổi 3 trạng thái: pending, in_progress, completed.
+  // Trạng thái overdue do hệ thống tự tính theo hạn chót.
   const dl = {
     title,
     description: $("taskDescription").value.trim(),
@@ -1198,37 +1206,267 @@ $("nutDocTatCa").addEventListener("click", async () => {
 
 // Thông báo nhắc việc được tạo tự động sau khi lưu công việc — không cần nút thủ công
 
-// ===== THỐNG KÊ (STATISTICS) =====
-async function taiThongKe() {
-  const dem = { tong: danhSachCongViec.length, chuaBatDau: 0, dangLam: 0, hoanThanh: 0, quaHan: 0 };
-  danhSachCongViec.forEach(cv => {
-    const tt = layTrangThaiFE(cv);
-    if (tt === "not-started") dem.chuaBatDau++;
-    else if (tt === "in-progress") dem.dangLam++;
-    else if (tt === "completed") dem.hoanThanh++;
-    else if (tt === "overdue") dem.quaHan++;
-  });
-  $("tkTong").textContent = dem.tong;
-  $("tkChuaBatDau").textContent = dem.chuaBatDau;
-  $("tkDangLam").textContent = dem.dangLam;
-  $("tkHoanThanh").textContent = dem.hoanThanh;
-  $("tkQuaHan").textContent = dem.quaHan;
-  $("tkTiLe").textContent = dem.tong ? Math.round(dem.hoanThanh / dem.tong * 100) + "%" : "0%";
+// ===== LỊCH BIỂU (CALENDAR SCHEDULE) =====
+const THU_TRONG_TUAN = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
+const lichThongKeState = {
+  thangDangXem: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+  locTrangThai: "all",
+  daKhoiTao: false,
+};
 
-  const max = Math.max(dem.chuaBatDau, dem.dangLam, dem.hoanThanh, dem.quaHan, 1);
-  $("bieuDoThongKe").innerHTML = [
-    { nhan: "Chưa bắt đầu", so: dem.chuaBatDau, lop: "gray" },
-    { nhan: "Đang làm", so: dem.dangLam, lop: "orange" },
-    { nhan: "Hoàn thành", so: dem.hoanThanh, lop: "green" },
-    { nhan: "Quá hạn", so: dem.quaHan, lop: "red" },
-  ].map(d => `
-    <div class="chart-bar-row">
-      <div class="chart-bar-label">${d.nhan}</div>
-      <div class="chart-bar-track">
-        <div class="chart-bar-fill ${d.lop}" style="width:${Math.max(d.so / max * 100, d.so ? 8 : 0)}%">${d.so}</div>
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
+function dauNgay(ngay) {
+  return new Date(ngay.getFullYear(), ngay.getMonth(), ngay.getDate());
+}
+
+function congNgay(ngay, soNgay) {
+  const kq = new Date(ngay);
+  kq.setDate(kq.getDate() + soNgay);
+  return kq;
+}
+
+function docNgayHopLe(giaTri) {
+  if (!giaTri) return null;
+  const d = new Date(giaTri);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function dinhDangGioNgan(ngay) {
+  if (!ngay) return "--:--";
+  return ngay.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+}
+
+function dinhDangNgayNgan(ngay) {
+  if (!ngay) return "";
+  return `${pad2(ngay.getDate())}/${pad2(ngay.getMonth() + 1)}`;
+}
+
+function layKhoangNgayCongViec(cv) {
+  const batDauRaw = docNgayHopLe(cv.start_date) || docNgayHopLe(cv.due_date);
+  const ketThucRaw = docNgayHopLe(cv.due_date) || docNgayHopLe(cv.start_date);
+  if (!batDauRaw || !ketThucRaw) return null;
+
+  const batDauDay = dauNgay(batDauRaw);
+  let ketThucDay = dauNgay(ketThucRaw);
+  if (ketThucDay.getTime() < batDauDay.getTime()) {
+    ketThucDay = new Date(batDauDay);
+  }
+
+  return {
+    batDauRaw,
+    ketThucRaw,
+    batDauDay,
+    ketThucDay,
+  };
+}
+
+function batDauLichTheoThang(thangDangXem) {
+  const ngayDauThang = new Date(thangDangXem.getFullYear(), thangDangXem.getMonth(), 1);
+  const thu = (ngayDauThang.getDay() + 6) % 7;
+  return congNgay(ngayDauThang, -thu);
+}
+
+function ketThucLichTheoThang(thangDangXem) {
+  const ngayCuoiThang = new Date(thangDangXem.getFullYear(), thangDangXem.getMonth() + 1, 0);
+  const thu = (ngayCuoiThang.getDay() + 6) % 7;
+  return congNgay(ngayCuoiThang, 6 - thu);
+}
+
+function layMauSuKienTheoTrangThai(trangThaiFE) {
+  return {
+    "not-started": "planned",
+    "in-progress": "progress",
+    completed: "done",
+    overdue: "overdue",
+  }[trangThaiFE] || "planned";
+}
+
+function taoMoTaThoiGianSuKien(suKien) {
+  const motNgay = suKien.batDauDay.getTime() === suKien.ketThucDay.getTime();
+  if (motNgay) {
+    if (suKien.batDauRaw.getTime() === suKien.ketThucRaw.getTime()) {
+      return `Lúc ${dinhDangGioNgan(suKien.ketThucRaw)}`;
+    }
+    return `${dinhDangGioNgan(suKien.batDauRaw)} - ${dinhDangGioNgan(suKien.ketThucRaw)}`;
+  }
+  if (suKien.isStart) {
+    return `${dinhDangGioNgan(suKien.batDauRaw)} (${dinhDangNgayNgan(suKien.batDauRaw)})`;
+  }
+  if (suKien.isEnd) {
+    return `Đến ${dinhDangGioNgan(suKien.ketThucRaw)}`;
+  }
+  return "Tiếp tục";
+}
+
+function laySuKienTrongNgay(ngay) {
+  const mocNgay = dauNgay(ngay).getTime();
+  const diemUuTien = { high: 0, medium: 1, low: 2 };
+  const suKien = [];
+
+  for (const cv of danhSachCongViec) {
+    const trangThaiFE = layTrangThaiFE(cv);
+    if (lichThongKeState.locTrangThai !== "all" && lichThongKeState.locTrangThai !== trangThaiFE) {
+      continue;
+    }
+
+    const khoang = layKhoangNgayCongViec(cv);
+    if (!khoang) continue;
+
+    if (mocNgay < khoang.batDauDay.getTime() || mocNgay > khoang.ketThucDay.getTime()) {
+      continue;
+    }
+
+    suKien.push({
+      cv,
+      trangThaiFE,
+      ...khoang,
+      isStart: laCungNgay(ngay, khoang.batDauDay),
+      isEnd: laCungNgay(ngay, khoang.ketThucDay),
+    });
+  }
+
+  suKien.sort((a, b) => {
+    const pa = diemUuTien[a.cv.priority] ?? 9;
+    const pb = diemUuTien[b.cv.priority] ?? 9;
+    if (pa !== pb) return pa - pb;
+    const ta = (docNgayHopLe(a.cv.due_date) || docNgayHopLe(a.cv.start_date) || new Date(0)).getTime();
+    const tb = (docNgayHopLe(b.cv.due_date) || docNgayHopLe(b.cv.start_date) || new Date(0)).getTime();
+    return ta - tb;
+  });
+
+  return suKien;
+}
+
+function veThuTrongTuan() {
+  const el = $("lichWeekdays");
+  if (!el) return;
+  el.innerHTML = THU_TRONG_TUAN.map((thu) => `<div class="lich-weekday">${thu}</div>`).join("");
+}
+
+function veLichThongKe() {
+  const tieuDe = $("lichThangNam");
+  const luoi = $("lichGrid");
+  const ngayHomNay = new Date();
+  if (!tieuDe || !luoi) return;
+
+  if (!$("lichWeekdays")?.children?.length) {
+    veThuTrongTuan();
+  }
+
+  const thangDangXem = lichThongKeState.thangDangXem;
+  tieuDe.textContent = `Tháng ${thangDangXem.getMonth() + 1}/${thangDangXem.getFullYear()}`;
+
+  const batDau = batDauLichTheoThang(thangDangXem);
+  const ketThuc = ketThucLichTheoThang(thangDangXem);
+  const conTro = new Date(batDau);
+  let html = "";
+
+  while (conTro.getTime() <= ketThuc.getTime()) {
+    const ngay = new Date(conTro);
+    const ngoaiThang = ngay.getMonth() !== thangDangXem.getMonth();
+    const laHomNay = laCungNgay(ngay, ngayHomNay);
+    const suKienNgay = laySuKienTrongNgay(ngay);
+    const thuTrongTuan = THU_TRONG_TUAN[(ngay.getDay() + 6) % 7];
+    const mocNgay = dauNgay(ngay).getTime();
+
+    const dsSuKien = suKienNgay.slice(0, 3).map((suKien) => {
+      const lopMau = layMauSuKienTheoTrangThai(suKien.trangThaiFE);
+      const moTaThoiGian = taoMoTaThoiGianSuKien(suKien);
+      return `<button type="button" class="lich-event ${lopMau}" data-task-id="${suKien.cv.task_id}" title="${thoatHtml(suKien.cv.title)} - ${thoatHtml(nhanTrangThai(suKien.trangThaiFE))}">
+        <span class="lich-event-title">${thoatHtml(suKien.cv.title)}</span>
+        <span class="lich-event-time">${thoatHtml(moTaThoiGian)}</span>
+      </button>`;
+    }).join("");
+
+    const soConLai = suKienNgay.length - 3;
+    const thongBaoThem = soConLai > 0
+      ? `<button type="button" class="lich-more" data-day-ts="${mocNgay}">+${soConLai} lịch khác</button>`
+      : "";
+
+    html += `<div class="lich-day ${ngoaiThang ? "outside" : ""} ${laHomNay ? "today" : ""}" data-weekday="${thuTrongTuan}">
+      <span class="lich-day-number">${ngay.getDate()}</span>
+      <div class="lich-events">
+        ${dsSuKien}
+        ${thongBaoThem}
       </div>
-    </div>
-  `).join("");
+    </div>`;
+
+    conTro.setDate(conTro.getDate() + 1);
+  }
+
+  luoi.innerHTML = html;
+}
+
+function khoiTaoLichThongKeNeuCan() {
+  if (lichThongKeState.daKhoiTao) return;
+  const nutPrev = $("lichPrevMonth");
+  const nutNext = $("lichNextMonth");
+  const nutHomNay = $("lichHomNay");
+  const boLoc = $("lichLocTrangThai");
+  const luoi = $("lichGrid");
+  if (!nutPrev || !nutNext || !nutHomNay || !boLoc || !luoi) return;
+
+  nutPrev.addEventListener("click", () => {
+    lichThongKeState.thangDangXem = new Date(
+      lichThongKeState.thangDangXem.getFullYear(),
+      lichThongKeState.thangDangXem.getMonth() - 1,
+      1,
+    );
+    veLichThongKe();
+  });
+
+  nutNext.addEventListener("click", () => {
+    lichThongKeState.thangDangXem = new Date(
+      lichThongKeState.thangDangXem.getFullYear(),
+      lichThongKeState.thangDangXem.getMonth() + 1,
+      1,
+    );
+    veLichThongKe();
+  });
+
+  nutHomNay.addEventListener("click", () => {
+    const homNay = new Date();
+    lichThongKeState.thangDangXem = new Date(homNay.getFullYear(), homNay.getMonth(), 1);
+    veLichThongKe();
+  });
+
+  boLoc.addEventListener("change", () => {
+    lichThongKeState.locTrangThai = boLoc.value || "all";
+    veLichThongKe();
+  });
+
+  luoi.addEventListener("click", (e) => {
+    const nutSuKien = e.target.closest(".lich-event");
+    if (nutSuKien) {
+      const maCongViec = Number.parseInt(nutSuKien.dataset.taskId, 10);
+      const congViec = danhSachCongViec.find((cv) => Number(cv.task_id) === maCongViec);
+      if (congViec) {
+        moModalCongViec("edit", congViec);
+      }
+      return;
+    }
+
+    const nutXemThem = e.target.closest(".lich-more");
+    if (nutXemThem) {
+      const mocNgay = Number.parseInt(nutXemThem.dataset.dayTs, 10);
+      const ngay = new Date(mocNgay);
+      const ds = laySuKienTrongNgay(ngay);
+      const noiDung = ds.length
+        ? ds.map((item, i) => `${i + 1}. ${item.cv.title} (${nhanTrangThai(item.trangThaiFE)})`).join("\n")
+        : "Không có công việc.";
+      alert(`${dinhDangNgayNgan(ngay)}:\n${noiDung}`);
+    }
+  });
+
+  lichThongKeState.daKhoiTao = true;
+}
+
+async function taiThongKe() {
+  khoiTaoLichThongKeNeuCan();
+  veLichThongKe();
 }
 
 // ===== THÔNG TIN CÁ NHÂN (USER PROFILE) =====
