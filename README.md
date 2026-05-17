@@ -24,21 +24,27 @@ Hệ thống cho phép người dùng:
 
 ## 3. 🛠️ Công nghệ sử dụng
 
-### Frontend
+### Công nghệ mã nguồn mở trong dự án
 
-- React.js
-- Vite
-- JavaScript
+- Node.js — môi trường chạy backend
+- Express.js — framework web cho server/API
+- PostgreSQL — hệ quản trị cơ sở dữ liệu
+- JavaScript — ngôn ngữ chính cho frontend và backend
+- HTML / CSS — xây dựng giao diện web
+- npm — trình quản lý package của Node.js
+- dotenv — đọc biến môi trường từ file `.env`
+- Git — quản lý phiên bản mã nguồn
+- GitHub — nền tảng lưu trữ và cộng tác mã nguồn
+- MIT License — giấy phép mã nguồn mở project đang dùng
 
-### Backend
+### Luồng xử lý dữ liệu
 
-- Node.js
-- Express.js
-- JavaScript
+- Người dùng thao tác trên frontend (HTML/CSS/JavaScript)
+- Frontend gửi request HTTP đến backend thông qua các endpoint `/api/...`
+- Backend (Node.js + Express.js) xử lý nghiệp vụ, truy vấn PostgreSQL
+- Backend trả dữ liệu JSON để frontend cập nhật giao diện
 
-### Database
-
-- PostgreSQL
+Tất cả thao tác của người dùng đều bắt đầu ở frontend và được gửi về backend để xử lý.
 
 ## 4. ✅ Chức năng chính
 

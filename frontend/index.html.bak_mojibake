@@ -1,0 +1,669 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow â€” Quáº£n lÃ½ cÃ´ng viá»‡c cÃ¡ nhÃ¢n</title>
+  <meta name="description"
+    content="á»¨ng dá»¥ng web quáº£n lÃ½ cÃ´ng viá»‡c cÃ¡ nhÃ¢n â€” láº­p káº¿ hoáº¡ch, theo dÃµi tiáº¿n Ä‘á»™, nháº¯c háº¡n vÃ  thá»‘ng kÃª hiá»‡u quáº£ lÃ m viá»‡c." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=4" />
+  <style>
+    /* ===== CUSTOM DATE-TIME PICKER ===== */
+    .dtp-wrap { position: relative; }
+    .dtp-display {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; border: 1px solid #000;
+      border-radius: 0; padding: 10px 14px; cursor: pointer;
+      font-size: 0.95rem; color: #000;
+      min-height: 42px;
+    }
+    .dtp-display:hover, .dtp-display.open { border-color: #000; box-shadow: 2px 2px 0 #000; }
+    .dtp-display .dtp-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .dtp-display .dtp-val { flex: 1; }
+    .dtp-display .dtp-placeholder { color: #888; }
+    .dtp-panel {
+      display: none; position: absolute; z-index: 9999; bottom: calc(100% + 4px); top: auto; left: 0;
+      background: #fff; border: 1px solid #000;
+      border-radius: 0; padding: 16px;
+      box-shadow: 4px 4px 0 #000;
+      width: 310px;
+    }
+    .dtp-panel.open { display: block; }
+    .dtp-wrap:has(.dtp-panel.open) { z-index: 9999; }
+    /* ThÃ¡ng Ä‘iá»u hÆ°á»›ng */
+    .dtp-cal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; padding-bottom: 8px;
+      border-bottom: 1px solid #000;
+    }
+    .dtp-cal-head span { font-weight: 700; font-size: 0.95rem; color: #000; }
+    .dtp-nav {
+      background: #fff; border: 1px solid #000; color: #000;
+      font-size: 1rem; cursor: pointer; padding: 3px 10px;
+      font-weight: 700; line-height: 1;
+    }
+    .dtp-nav:hover { background: #000; color: #fff; }
+    /* LÆ°á»›i lá»‹ch */
+    .dtp-cal-grid {
+      display: grid; grid-template-columns: repeat(7,1fr); gap: 2px;
+      margin-bottom: 12px;
+    }
+    .dtp-dow {
+      text-align: center; font-size: 0.68rem; font-weight: 700;
+      color: #666; padding: 4px 0;
+    }
+    .dtp-day {
+      text-align: center; padding: 6px 2px;
+      font-size: 0.82rem; cursor: pointer; color: #000;
+      border: 1px solid transparent; background: #fff;
+    }
+    .dtp-day:hover:not(:disabled) { background: #f0f0f0; border-color: #000; }
+    .dtp-day.today { font-weight: 700; border-color: #000; }
+    .dtp-day.selected { background: #000 !important; color: #fff !important; font-weight: 700; }
+    .dtp-day.other-month { color: #ccc; }
+    .dtp-day:disabled { color: #ccc !important; cursor: not-allowed !important; text-decoration: line-through; }
+    /* Pháº§n chá»n giá» */
+    .dtp-time-block {
+      border-top: 1px solid #000; padding-top: 12px; margin-bottom: 12px;
+    }
+    .dtp-time-title {
+      font-size: 0.75rem; color: #555; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+    }
+    .dtp-time-row {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .dtp-time-col {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .dtp-time-col-label {
+      font-size: 0.68rem; color: #888; font-weight: 600;
+    }
+    .dtp-panel input.dtp-time-num {
+      width: 64px; border: 1px solid #000; background: #fff;
+      color: #000; font-size: 1.5rem; font-weight: 700;
+      text-align: center; padding: 0; height: 42px; line-height: 42px;
+      -moz-appearance: textfield; appearance: textfield;
+      margin: 0;
+    }
+    .dtp-panel input.dtp-time-num.invalid { border-color: #ef4444 !important; color: #ef4444; background: #fef2f2; }
+    .dtp-panel input.dtp-time-num::-webkit-inner-spin-button,
+    .dtp-panel input.dtp-time-num::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .dtp-panel input.dtp-time-num:focus { outline: none; box-shadow: 2px 2px 0 #000; }
+    .dtp-time-err { color: #ef4444; font-size: 0.7rem; font-weight: 600; text-align: center; min-height: 14px; margin-top: 6px; }
+    .dtp-time-sep {
+      color: #000; font-weight: 900; font-size: 1.5rem;
+      user-select: none; padding-top: 18px;
+    }
+    /* Actions */
+    .dtp-actions {
+      display: flex; gap: 8px;
+    }
+    .dtp-btn-ok {
+      flex: 1; background: #000; color: #fff; border: 1px solid #000;
+      padding: 9px; font-weight: 700; cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .dtp-btn-ok:hover { background: #333; }
+    .dtp-btn-clear {
+      background: #fff; color: #000; border: 1px solid #000;
+      padding: 9px 14px; font-size: 0.9rem; cursor: pointer; font-weight: 600;
+    }
+    .dtp-btn-clear:hover { background: #f0f0f0; }
+    .dtp-wrap.right-align .dtp-panel { left: auto; right: 0; }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== TRANG CHá»¦ (CHÆ¯A ÄÄ‚NG NHáº¬P) ===== -->
+  <div id="trangChu" class="landing-page">
+    <header class="landing-header">
+      <div class="landing-nav">
+        <div class="landing-brand">
+          <span class="brand-icon">ðŸ“‹</span>
+          <span class="brand-name">TaskFlow</span>
+        </div>
+        <div class="landing-nav-actions">
+          <button class="btn-ghost" id="nutDiDangNhap" type="button">ÄÄƒng nháº­p</button>
+          <button class="btn-accent" id="nutDiDangKy" type="button">ÄÄƒng kÃ½ miá»…n phÃ­</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-badge">âœ¨ Quáº£n lÃ½ cÃ´ng viá»‡c thÃ´ng minh</div>
+        <h1 class="hero-title">Sáº¯p xáº¿p cuá»™c sá»‘ng.<br /><span class="hero-highlight">HoÃ n thÃ nh má»¥c tiÃªu.</span></h1>
+        <p class="hero-subtitle">TaskFlow giÃºp báº¡n láº­p káº¿ hoáº¡ch, theo dÃµi tiáº¿n Ä‘á»™ vÃ  hoÃ n thÃ nh cÃ´ng viá»‡c hiá»‡u quáº£ hÆ¡n
+          má»—i ngÃ y. ÄÆ¡n giáº£n, trá»±c quan, hoÃ n toÃ n miá»…n phÃ­.</p>
+        <div class="hero-cta">
+          <button class="btn-accent btn-lg" id="nutBatDauNgay" type="button">Báº¯t Ä‘áº§u ngay â†’</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card-stack">
+          <div class="hero-card card-1">
+            <div class="hc-icon blue-glow">ðŸ“</div>
+            <div>
+              <div class="hc-title">Quáº£n lÃ½ cÃ´ng viá»‡c</div>
+              <div class="hc-desc">Táº¡o, sáº¯p xáº¿p vÃ  theo dÃµi má»i cÃ´ng viá»‡c</div>
+            </div>
+          </div>
+          <div class="hero-card card-2">
+            <div class="hc-icon green-glow">ðŸ””</div>
+            <div>
+              <div class="hc-title">Nháº¯c nhá»Ÿ thÃ´ng minh</div>
+              <div class="hc-desc">KhÃ´ng bao giá» bá» lá»¡ deadline quan trá»ng</div>
+            </div>
+          </div>
+          <div class="hero-card card-3">
+            <div class="hc-icon purple-glow">ðŸ“Š</div>
+            <div>
+              <div class="hc-title">Thá»‘ng kÃª chi tiáº¿t</div>
+              <div class="hc-desc">ÄÃ¡nh giÃ¡ hiá»‡u suáº¥t vÃ  cáº£i thiá»‡n liÃªn tá»¥c</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features-section">
+      <h2 class="features-heading">Táº¥t cáº£ nhá»¯ng gÃ¬ báº¡n cáº§n</h2>
+      <p class="features-sub">CÃ´ng cá»¥ hoÃ n chá»‰nh Ä‘á»ƒ quáº£n lÃ½ cÃ´ng viá»‡c cÃ¡ nhÃ¢n hiá»‡u quáº£</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">ðŸ—‚ï¸</div>
+          <h3>Danh má»¥c linh hoáº¡t</h3>
+          <p>PhÃ¢n loáº¡i cÃ´ng viá»‡c theo danh má»¥c tÃ¹y chá»‰nh: Há»c táº­p, CÃ¡ nhÃ¢n, CÃ´ng viá»‡c...</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">ðŸ”Ž</div>
+          <h3>TÃ¬m kiáº¿m & Lá»c</h3>
+          <p>TÃ¬m kiáº¿m nhanh theo tá»« khÃ³a, tráº¡ng thÃ¡i, má»©c Æ°u tiÃªn vÃ  danh má»¥c.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">âš¡</div>
+          <h3>Theo dÃµi tráº¡ng thÃ¡i</h3>
+          <p>Cáº­p nháº­t tiáº¿n Ä‘á»™: ChÆ°a báº¯t Ä‘áº§u â†’ Äang lÃ m â†’ HoÃ n thÃ nh.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">ðŸ”’</div>
+          <h3>Báº£o máº­t dá»¯ liá»‡u</h3>
+          <p>Máº­t kháº©u Ä‘Æ°á»£c mÃ£ hÃ³a, dá»¯ liá»‡u chá»‰ thuá»™c vá» báº¡n.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="landing-footer">
+      <p>Â© 2026 TaskFlow â€” Quáº£n lÃ½ cÃ´ng viá»‡c cÃ¡ nhÃ¢n. MIT License.</p>
+    </footer>
+  </div>
+
+  <!-- ===== TRANG ÄÄ‚NG NHáº¬P ===== -->
+  <div id="trangDangNhap" class="auth-page" style="display:none;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">ðŸ“‹</div>
+        <h1>ÄÄƒng nháº­p</h1>
+        <p>Quáº£n lÃ½ cÃ´ng viá»‡c cÃ¡ nhÃ¢n hiá»‡u quáº£</p>
+      </div>
+      <form id="formDangNhap" class="auth-form">
+        <div class="form-group">
+          <label for="dnEmail">Email</label>
+          <input type="email" id="dnEmail" placeholder="email@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="dnMatKhau">Máº­t kháº©u</label>
+          <input type="password" id="dnMatKhau" placeholder="Nháº­p máº­t kháº©u" required />
+        </div>
+        <div id="loiDangNhap" class="error-msg"></div>
+        <button type="submit" class="btn-primary btn-full">ÄÄƒng nháº­p</button>
+      </form>
+      <p class="auth-switch">ChÆ°a cÃ³ tÃ i khoáº£n? <a href="#" id="nutMoDangKy">ÄÄƒng kÃ½ ngay</a></p>
+      <p class="auth-switch"><a href="#" id="nutQuenMatKhau">QuÃªn máº­t kháº©u?</a></p>
+      <p class="auth-switch"><a href="#" id="nutVeTrangChu">â† Quay láº¡i trang chá»§</a></p>
+    </div>
+  </div>
+
+  <!-- ===== TRANG ÄÄ‚NG KÃ ===== -->
+  <div id="trangDangKy" class="auth-page" style="display:none;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">ðŸ“‹</div>
+        <h1>ÄÄƒng kÃ½</h1>
+        <p>Táº¡o tÃ i khoáº£n má»›i</p>
+      </div>
+      <form id="formDangKy" class="auth-form">
+        <div class="form-group">
+          <label for="dkHoTen">Há» vÃ  tÃªn</label>
+          <input type="text" id="dkHoTen" placeholder="Nguyá»…n VÄƒn A" required />
+        </div>
+        <div class="form-group">
+          <label for="dkEmail">Email</label>
+          <input type="email" id="dkEmail" placeholder="email@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="dkMatKhau">Máº­t kháº©u</label>
+          <input type="password" id="dkMatKhau" placeholder="Ãt nháº¥t 6 kÃ½ tá»±" required minlength="6" />
+        </div>
+        <div class="form-group">
+          <label for="dkXacNhan">XÃ¡c nháº­n máº­t kháº©u</label>
+          <input type="password" id="dkXacNhan" placeholder="Nháº­p láº¡i máº­t kháº©u" required />
+        </div>
+        <div id="loiDangKy" class="error-msg"></div>
+        <button type="submit" class="btn-primary btn-full">ÄÄƒng kÃ½</button>
+      </form>
+      <p class="auth-switch">ÄÃ£ cÃ³ tÃ i khoáº£n? <a href="#" id="nutMoDangNhap">ÄÄƒng nháº­p</a></p>
+      <p class="auth-switch"><a href="#" id="nutVeTrangChu2">â† Quay láº¡i trang chá»§</a></p>
+    </div>
+  </div>
+
+  <!-- ===== LAYOUT CHÃNH (SAU ÄÄ‚NG NHáº¬P) ===== -->
+  <div id="layoutChinh" class="app-layout" style="display:none;">
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">ðŸ“‹</span>
+        <span class="sidebar-title">TaskFlow</span>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li><button class="menu-item active" data-page="congViec" type="button">ðŸ“ CÃ´ng viá»‡c</button></li>
+        <li><button class="menu-item" data-page="danhMuc" type="button">ðŸ—‚ï¸ Danh má»¥c</button></li>
+        <li><button class="menu-item" data-page="thongBao" type="button">ðŸ”” ThÃ´ng bÃ¡o <span id="badgeThongBao"
+              class="menu-badge" style="display:none;">0</span></button></li>
+        <li><button class="menu-item" data-page="thongKe" type="button">ðŸ“Š Thá»‘ng kÃª</button></li>
+        <li><button class="menu-item" data-page="caNhan" type="button">ðŸ‘¤ CÃ¡ nhÃ¢n</button></li>
+        <li id="menuAdmin" style="display:none;"><button class="menu-item" data-page="quanTri" type="button">ðŸ›¡ï¸ Quáº£n
+            trá»‹</button></li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar-sm" id="avatarSidebar">K</div>
+          <span id="tenNguoiDungSidebar">User</span>
+        </div>
+        <button class="btn-logout" id="nutDangXuat" type="button">ÄÄƒng xuáº¥t</button>
+      </div>
+    </nav>
+
+    <!-- Ná»™i dung chÃ­nh -->
+    <main class="main-content">
+
+      <!-- ===== TRANG CÃ”NG VIá»†C ===== -->
+      <section id="pageCongViec" class="page">
+        <div class="page-header">
+          <div>
+            <h1>CÃ´ng viá»‡c cá»§a tÃ´i</h1>
+          </div>
+          <button class="add-btn" id="openAddModal" type="button">
+            <span>ï¼‹</span>
+            <span>ThÃªm cÃ´ng viá»‡c</span>
+          </button>
+        </div>
+
+        <!-- TiÃªu Ä‘iá»ƒm (Focus Mode) -->
+        <div id="focusModeContainer" class="focus-mode-container" style="display: none;">
+          <h2 class="focus-mode-title">
+            <span class="focus-mode-icon">ðŸŽ¯</span> VIá»†C Cáº¦N LÃ€M NGAY
+          </h2>
+          <div id="focusTaskCard"></div>
+        </div>
+
+        <section class="task-dashboard">
+          <section class="task-kpi-grid" aria-label="Thá»‘ng kÃª tá»•ng quan cÃ´ng viá»‡c">
+            <article class="task-kpi-card">
+              <p>Tá»•ng sá»‘ cÃ´ng viá»‡c</p>
+              <strong class="task-kpi-number kpi-blue" id="dbTongCongViec">0</strong>
+            </article>
+            <article class="task-kpi-card">
+              <p>Äang quÃ¡ háº¡n</p>
+              <strong class="task-kpi-number kpi-red" id="dbQuaHan">0</strong>
+            </article>
+            <article class="task-kpi-card">
+              <p>Deadline hÃ´m nay</p>
+              <strong class="task-kpi-number kpi-cyan" id="dbDeadlineHomNay">0</strong>
+            </article>
+            <article class="task-kpi-card">
+              <p>Äang lÃ m</p>
+              <strong class="task-kpi-number kpi-orange" id="dbDangLam">0</strong>
+            </article>
+            <article class="task-kpi-card">
+              <p>ChÆ°a báº¯t Ä‘áº§u</p>
+              <strong class="task-kpi-number kpi-slate" id="dbChuaBatDau">0</strong>
+            </article>
+            <article class="task-kpi-card">
+              <p>ÄÃ£ hoÃ n thÃ nh</p>
+              <strong class="task-kpi-number kpi-green" id="dbHoanThanh">0</strong>
+            </article>
+          </section>
+
+          <section class="task-visual-grid" aria-label="Biá»ƒu Ä‘á»“ cÃ´ng viá»‡c">
+            <article class="task-visual-card">
+              <header class="task-visual-head">
+                <h3>Biá»ƒu Ä‘á»“ tá»‰ lá»‡ cÃ´ng viá»‡c</h3>
+              </header>
+              <div class="task-donut-panel">
+                <div class="task-donut" id="taskDonutChart">
+                  <div class="task-donut-center" id="taskDonutCenter">0%</div>
+                </div>
+                <div class="task-donut-legend" id="taskDonutLegend"></div>
+              </div>
+            </article>
+
+            <article class="task-visual-card">
+              <header class="task-visual-head">
+                <h3>Tráº¡ng thÃ¡i cÃ´ng viá»‡c</h3>
+              </header>
+              <div class="task-status-bars" id="taskStatusBars"></div>
+            </article>
+
+            <article class="task-visual-card">
+              <header class="task-visual-head">
+                <h3>Má»©c Ä‘á»™ hoÃ n thÃ nh</h3>
+              </header>
+              <div class="task-progress-wrap">
+                <div class="task-progress-ring" id="taskProgressRing">
+                  <div class="task-progress-value" id="taskProgressValue">0%</div>
+                </div>
+                <p class="task-progress-note" id="taskProgressNote">ChÆ°a cÃ³ dá»¯ liá»‡u Ä‘á»ƒ Ä‘Ã¡nh giÃ¡.</p>
+              </div>
+            </article>
+          </section>
+        </section>
+
+        <section class="toolbar">
+          <div class="search-box">
+            <span class="search-icon">âŒ•</span>
+            <input type="text" id="searchInput" placeholder="TÃ¬m kiáº¿m cÃ´ng viá»‡c..." />
+          </div>
+          <button class="filter-btn" id="toggleFilterBtn" type="button">
+            <span>â˜·</span>
+            <span>Bá»™ lá»c</span>
+          </button>
+        </section>
+
+        <section class="filter-panel" id="filterPanel">
+          <div class="field">
+            <label for="statusFilter">Tráº¡ng thÃ¡i</label>
+            <select id="statusFilter">
+              <option value="all">Táº¥t cáº£</option>
+              <option value="not-started">ChÆ°a báº¯t Ä‘áº§u</option>
+              <option value="in-progress">Äang lÃ m</option>
+              <option value="completed">HoÃ n thÃ nh</option>
+              <option value="overdue">QuÃ¡ háº¡n</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="priorityFilter">Má»©c Ä‘á»™ Æ°u tiÃªn</label>
+            <select id="priorityFilter">
+              <option value="all">Táº¥t cáº£</option>
+              <option value="low">Tháº¥p</option>
+              <option value="medium">Trung bÃ¬nh</option>
+              <option value="high">Cao</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="categoryFilter">Danh má»¥c</label>
+            <select id="categoryFilter">
+              <option value="all">Táº¥t cáº£</option>
+            </select>
+          </div>
+          <div class="field field-btn">
+            <button id="resetFilterBtn" type="button">Äáº·t láº¡i bá»™ lá»c</button>
+          </div>
+        </section>
+
+        <nav class="tabs">
+          <button class="tab active" data-tab="all" type="button">Táº¥t cáº£ (<span>0</span>)</button>
+          <button class="tab" data-tab="not-started" type="button">ChÆ°a báº¯t Ä‘áº§u (<span>0</span>)</button>
+          <button class="tab" data-tab="in-progress" type="button">Äang lÃ m (<span>0</span>)</button>
+          <button class="tab" data-tab="completed" type="button">HoÃ n thÃ nh (<span>0</span>)</button>
+          <button class="tab" data-tab="overdue" type="button">QuÃ¡ háº¡n (<span>0</span>)</button>
+        </nav>
+
+        <section class="list" id="taskList"></section>
+        <div class="empty-state" id="emptyState">KhÃ´ng cÃ³ cÃ´ng viá»‡c nÃ o phÃ¹ há»£p.</div>
+      </section>
+
+      <!-- ===== TRANG DANH Má»¤C ===== -->
+      <section id="pageDanhMuc" class="page" style="display:none;">
+        <div class="page-header">
+          <h1>Danh mục công việc</h1>
+          <button class="add-btn" id="nutThemDanhMuc" type="button">
+            <span>＋</span>
+            <span>Thêm danh mục</span>
+          </button>
+        </div>
+        <div class="dm-form-wrap" id="formThemDanhMuc" style="display:none;">
+          <input type="text" id="tenDanhMucMoi" placeholder="Nhập tên danh mục..." class="dm-input" />
+          <select id="iconDanhMucMoi" class="dm-icon-select" title="Chọn icon danh mục"></select>
+          <button class="btn-primary" id="nutLuuDanhMuc" type="button">Lưu</button>
+          <button class="btn-secondary" id="nutHuyDanhMuc" type="button">Hủy</button>
+        </div>
+        <div class="dm-list" id="danhSachDanhMuc"></div>
+        <div class="empty-state show" id="rongDanhMuc">Chưa có danh mục nào. Hãy tạo danh mục đầu tiên!</div>
+      </section>
+
+      <!-- ===== TRANG THÃ”NG BÃO ===== -->
+      <section id="pageThongBao" class="page" style="display:none;">
+        <div class="page-header">
+          <h1>ThÃ´ng bÃ¡o</h1>
+          <div class="page-actions">
+            <button class="btn-secondary" id="nutDocTatCa" type="button">ÄÃ¡nh dáº¥u táº¥t cáº£ Ä‘Ã£ Ä‘á»c</button>
+            <button class="btn-danger" id="nutXoaTatCaThongBao" type="button">XÃ³a táº¥t cáº£</button>
+          </div>
+        </div>
+        <div class="tb-list" id="danhSachThongBao"></div>
+        <div class="empty-state show" id="rongThongBao">KhÃ´ng cÃ³ thÃ´ng bÃ¡o má»›i.</div>
+      </section>
+
+      <!-- ===== TRANG THá»NG KÃŠ ===== -->
+      <section id="pageThongKe" class="page" style="display:none;">
+        <div class="page-header">
+          <h1>Thá»‘ng kÃª cÃ´ng viá»‡c</h1>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card stat-total">
+            <div class="stat-number" id="tkTong">0</div>
+            <div class="stat-label">Tá»•ng cÃ´ng viá»‡c</div>
+          </div>
+          <div class="stat-card stat-pending">
+            <div class="stat-number" id="tkChuaBatDau">0</div>
+            <div class="stat-label">ChÆ°a báº¯t Ä‘áº§u</div>
+          </div>
+          <div class="stat-card stat-progress">
+            <div class="stat-number" id="tkDangLam">0</div>
+            <div class="stat-label">Äang lÃ m</div>
+          </div>
+          <div class="stat-card stat-done">
+            <div class="stat-number" id="tkHoanThanh">0</div>
+            <div class="stat-label">HoÃ n thÃ nh</div>
+          </div>
+          <div class="stat-card stat-overdue">
+            <div class="stat-number" id="tkQuaHan">0</div>
+            <div class="stat-label">QuÃ¡ háº¡n</div>
+          </div>
+          <div class="stat-card stat-rate">
+            <div class="stat-number" id="tkTiLe">0%</div>
+            <div class="stat-label">Tá»‰ lá»‡ hoÃ n thÃ nh</div>
+          </div>
+        </div>
+        <div class="chart-section">
+          <h2>Biá»ƒu Ä‘á»“ tráº¡ng thÃ¡i</h2>
+          <div class="chart-bars" id="bieuDoThongKe"></div>
+        </div>
+      </section>
+
+      <!-- ===== TRANG CÃ NHÃ‚N ===== -->
+      <section id="pageCaNhan" class="page" style="display:none;">
+        <div class="page-header">
+          <h1>ThÃ´ng tin cÃ¡ nhÃ¢n</h1>
+        </div>
+        <div class="profile-grid profile-grid-clean">
+          <div class="profile-card profile-card-main">
+            <div class="profile-headline">
+              <div class="profile-avatar-wrap">
+                <button type="button" class="profile-avatar" id="avatarCaNhan" title="Chá»n áº£nh Ä‘áº¡i diá»‡n" aria-label="Chá»n áº£nh Ä‘áº¡i diá»‡n">
+                  <span class="avatar-letter" id="avatarLetter">K</span>
+                  <span class="avatar-camera-badge" aria-hidden="true">ðŸ“·</span>
+                </button>
+                <input type="file" id="cnAvatar" accept="image/*" class="avatar-file-input" />
+              </div>
+              <div class="profile-summary">
+                <h2>Há»“ sÆ¡ cá»§a báº¡n</h2>
+                <p>Cáº­p nháº­t thÃ´ng tin cÃ¡ nhÃ¢n vÃ  áº£nh Ä‘áº¡i diá»‡n.</p>
+                <button type="button" id="btnXoaAnhCaNhan" class="profile-remove-avatar">XÃ³a áº£nh Ä‘áº¡i diá»‡n</button>
+              </div>
+            </div>
+            <form id="formCaNhan" class="profile-form">
+              <div class="profile-form-row">
+                <div class="form-group">
+                  <label for="cnHoTen">Há» vÃ  tÃªn</label>
+                  <input type="text" id="cnHoTen" required />
+                </div>
+                <div class="form-group">
+                  <label for="cnEmail">Email</label>
+                  <input type="email" id="cnEmail" disabled />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cnMoTa">MÃ´ táº£ báº£n thÃ¢n</label>
+                <textarea id="cnMoTa" rows="4" placeholder="Viáº¿t vÃ i dÃ²ng giá»›i thiá»‡u vá» báº¡n..."></textarea>
+              </div>
+              <div id="loiCaNhan" class="error-msg"></div>
+              <button type="submit" class="btn-primary">LÆ°u thay Ä‘á»•i</button>
+            </form>
+          </div>
+
+          <div class="profile-card profile-card-security">
+            <h2>Äá»•i máº­t kháº©u</h2>
+            <p class="profile-note">Äá»•i máº­t kháº©u Ä‘á»‹nh ká»³ Ä‘á»ƒ báº£o máº­t tÃ i khoáº£n tá»‘t hÆ¡n.</p>
+            <form id="formDoiMatKhau" class="profile-form">
+              <div class="form-group">
+                <label for="mkHienTai">Máº­t kháº©u hiá»‡n táº¡i</label>
+                <input type="password" id="mkHienTai" required />
+              </div>
+              <div class="form-group">
+                <label for="mkMoi">Máº­t kháº©u má»›i</label>
+                <input type="password" id="mkMoi" required minlength="6" />
+              </div>
+              <div class="form-group">
+                <label for="mkXacNhan">XÃ¡c nháº­n máº­t kháº©u má»›i</label>
+                <input type="password" id="mkXacNhan" required />
+              </div>
+              <div id="loiDoiMK" class="error-msg"></div>
+              <button type="submit" class="btn-primary">Äá»•i máº­t kháº©u</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TRANG QUáº¢N TRá»Š (Admin) ===== -->
+      <section id="pageQuanTri" class="page" style="display:none;">
+        <div class="page-header">
+          <h1>Quáº£n trá»‹ ngÆ°á»i dÃ¹ng</h1>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Há» tÃªn</th>
+                <th>Email</th>
+                <th>Vai trÃ²</th>
+                <th>Tráº¡ng thÃ¡i</th>
+                <th>Thao tÃ¡c</th>
+              </tr>
+            </thead>
+            <tbody id="danhSachNguoiDung"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== MODAL THÃŠM/Sá»¬A CÃ”NG VIá»†C ===== -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modalTitle">ThÃªm cÃ´ng viá»‡c</h2>
+        <button class="close-btn" id="closeModal" type="button">&times;</button>
+      </div>
+      <form id="taskForm">
+        <input type="hidden" id="taskId" />
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="taskTitle">TÃªn cÃ´ng viá»‡c</label>
+            <input type="text" id="taskTitle" placeholder="Nháº­p tÃªn cÃ´ng viá»‡c" required />
+          </div>
+          <div class="form-group">
+            <label for="taskDescription">MÃ´ táº£</label>
+            <textarea id="taskDescription" placeholder="Nháº­p mÃ´ táº£ cÃ´ng viá»‡c"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="taskPriority">Má»©c Æ°u tiÃªn</label>
+            <select id="taskPriority">
+              <option value="low">Tháº¥p</option>
+              <option value="medium">Trung bÃ¬nh</option>
+              <option value="high">Cao</option>
+            </select>
+          </div>
+          <!-- Tráº¡ng thÃ¡i Ä‘Æ°á»£c tÃ­nh tá»± Ä‘á»™ng â€” hidden inputs lÆ°u giÃ¡ trá»‹ -->
+          <input type="hidden" id="taskStatus" value="pending" />
+          <div class="form-row">
+            <div class="form-group">
+              <label>Báº¯t Ä‘áº§u <span style="color:#ef4444">*</span></label>
+              <div class="dtp-wrap" id="dtpStartWrap">
+                <div class="dtp-display" id="dtpStartDisplay" tabindex="0">
+                  <span class="dtp-icon">ðŸ“…</span>
+                  <span class="dtp-val" id="dtpStartVal"><span class="dtp-placeholder">ChÆ°a chá»n</span></span>
+                </div>
+                <div class="dtp-panel" id="dtpStartPanel"></div>
+              </div>
+              <input type="hidden" id="taskStartDate" />
+            </div>
+            <div class="form-group">
+              <label>Háº¡n hoÃ n thÃ nh <span style="color:#ef4444">*</span></label>
+              <div class="dtp-wrap" id="dtpDueWrap">
+                <div class="dtp-display" id="dtpDueDisplay" tabindex="0">
+                  <span class="dtp-icon">ðŸ“…</span>
+                  <span class="dtp-val" id="dtpDueVal"><span class="dtp-placeholder">ChÆ°a chá»n</span></span>
+                </div>
+                <div class="dtp-panel" id="dtpDuePanel"></div>
+              </div>
+              <input type="hidden" id="taskDueDate" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="taskCategory">Danh má»¥c</label>
+            <select id="taskCategory">
+              <option value=""></option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn-secondary" id="cancelModal" type="button">Há»§y</button>
+          <button class="btn-primary" type="submit">LÆ°u cÃ´ng viá»‡c</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== TOAST THÃ”NG BÃO ===== -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="script.js?v=6"></script>
+</body>
+
+</html>
+
+
