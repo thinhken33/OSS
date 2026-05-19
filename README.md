@@ -1,313 +1,146 @@
-# 📌 Web App Quản Lý Công Việc Cá Nhân
+# 🚀 TaskFlow Express - Web App Quản Lý Công Việc Cá Nhân
 
-## 1. 🧭 Tổng quan dự án
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2018.0.0-brightgreen)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/express-5.x-blue)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-15%2B-blue)](https://www.postgresql.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Dự án là một ứng dụng web hỗ trợ quản lý công việc cá nhân, giúp người dùng lập kế hoạch, theo dõi tiến độ và hoàn thành công việc hiệu quả hơn.
+**TaskFlow** là một giải pháp quản lý công việc cá nhân toàn diện, được xây dựng trên nền tảng Node.js và PostgreSQL. Dự án tập trung vào hiệu suất, tính đơn giản và trải nghiệm người dùng mượt mà với giao diện Vanilla JavaScript hiện đại.
 
-Hệ thống cho phép người dùng:
+---
 
-- Đăng ký, đăng nhập tài khoản
-- Tạo, chỉnh sửa, xóa công việc
-- Phân loại công việc theo trạng thái, mức độ ưu tiên, danh mục
-- Đặt thời hạn hoàn thành
-- Tìm kiếm và lọc công việc theo nhiều tiêu chí
-- Nhận thông báo nhắc việc sắp đến hạn hoặc quá hạn
-- Xem thống kê tổng quan hiệu suất làm việc
-- Quản trị tài khoản người dùng (vai trò admin)
+## 📂 Cấu trúc dự án
 
-## 2. 🎯 Mục tiêu hệ thống
+```text
+OSS/
+├── public/                 # Tài nguyên tĩnh (Frontend)
+│   ├── css/                # Stylesheets (Vanilla CSS)
+│   ├── js/                 # Logic xử lý phía client (Modular JS)
+│   │   ├── auth.js         # Xử lý đăng nhập/đăng ký
+│   │   ├── tasks.js        # Quản lý công việc (CRUD, Filter)
+│   │   ├── kanban.js       # Logic kéo thả và hiển thị bảng
+│   │   └── ...             # Các module chức năng khác
+│   ├── uploads/            # Thư mục lưu trữ file tải lên (Avatar)
+│   ├── index.html          # Entry point duy nhất của Frontend (SPA style)
+│   └── ...                 # Các trang lỗi (404, 403, 500)
+├── src/                    # Mã nguồn phía Backend
+│   ├── config/             # Cấu hình hệ thống (DB, Env)
+│   ├── controllers/        # Xử lý logic yêu cầu (Request Handlers)
+│   ├── database/           # Script khởi tạo SQL
+│   ├── middlewares/        # Các hàm trung gian (Auth, Validation)
+│   ├── models/             # Định nghĩa cấu trúc dữ liệu và truy vấn
+│   ├── routes/             # Định tuyến API
+│   ├── services/           # Nghiệp vụ cốt lõi (Business Logic)
+│   └── server.js           # Điểm khởi đầu của ứng dụng Backend
+├── .env                    # Biến môi trường (không commit)
+├── .env.example            # File mẫu cấu hình môi trường
+├── package.json            # Quản lý dependencies và scripts
+└── README.md               # Tài liệu hướng dẫn dự án
+```
 
-- Hỗ trợ quản lý công việc khoa học và có cấu trúc
-- Giảm tình trạng quên việc nhờ chế độ nhắc hạn
-- Tăng khả năng theo dõi tiến độ và đánh giá hiệu quả cá nhân
-- Đảm bảo dữ liệu được lưu trữ an toàn, truy cập theo đúng quyền
+---
 
-## 3. 🛠️ Công nghệ sử dụng
+## 🛠️ Công nghệ sử dụng
 
-### Frontend
+### Backend (Node.js & Express)
 
-- React.js
-- Vite
-- JavaScript
+- **Framework**: Express.js (v5.x)
+- **Database**: PostgreSQL với thư viện `pg`
+- **Authentication**: JSON Web Token (JWT) & bcryptjs
+- **File Upload**: Multer (xử lý avatar)
+- **Environment**: dotenv
 
-### Backend
+### Frontend (Modern Vanilla JS)
 
-- Node.js
-- Express.js
-- JavaScript
+- **Core**: HTML5, CSS3, JavaScript (ES6+)
+- **Styling**: Vanilla CSS với kiến trúc biến (CSS Variables)
+- **UI Components**: Tùy chỉnh (Datepicker, Kanban Board, Modal)
+- **Communication**: Fetch API (Async/Await)
 
-### Database
+---
 
-- PostgreSQL
+## ✨ Chức năng chính
 
-## 4. ✅ Chức năng chính
+### 🔐 Bảo mật & Xác thực
 
-### 4.1 🔐 Đăng ký
+- Đăng ký/Đăng nhập với mật khẩu được mã hóa (bcrypt).
+- Xác thực phiên làm việc qua JWT (Stored in LocalStorage).
+- Phân quyền người dùng (User) và quản trị viên (Admin).
 
-Người dùng có thể tạo tài khoản mới với các thông tin:
+### 📝 Quản lý công việc (Task Management)
 
-- Họ và tên
-- Email
-- Mật khẩu
-- Xác nhận mật khẩu
+- **CRUD**: Tạo, xem, sửa, xóa công việc.
+- **Kanban Board**: Quản lý trạng thái công việc trực quan.
+- **Phân loại**: Theo mức độ ưu tiên (Low, Medium, High) và danh mục tùy chỉnh.
+- **Thời hạn**: Đặt ngày bắt đầu và ngày kết thúc (Due date).
 
-Điều kiện và ràng buộc:
+### 🔔 Thông báo & Nhắc việc
 
-- Email không được trùng
-- Email đúng định dạng
-- Mật khẩu phải đạt mức độ mạnh tối thiểu
-- Mật khẩu xác nhận phải trùng khớp
+- Hệ thống tự động kiểm tra công việc sắp đến hạn mỗi 30 giây.
+- Tự động đánh dấu công việc "Quá hạn" (Overdue).
+- Thông báo thời gian thực ngay trên giao diện người dùng.
 
-Kết quả: Tài khoản mới được tạo, người dùng có thể đăng nhập.
+### 📊 Thống kê & Cá nhân hóa
 
-### 4.2 🔑 Đăng nhập
+- Dashboard thống kê hiệu suất (Hoàn thành, Đang làm, Quá hạn).
+- Quản lý hồ sơ cá nhân: Cập nhật thông tin, đổi ảnh đại diện, tiểu sử.
+- Quản lý danh mục (Categories) linh hoạt.
 
-Người dùng đăng nhập bằng:
+---
 
-- Email
-- Mật khẩu
+## 🚀 Hướng dẫn cài đặt
 
-Hỗ trợ:
+### 1. Yêu cầu hệ thống
 
-- Quên mật khẩu
-- Chuyển hướng tạo tài khoản nếu chưa có
+- **Node.js**: Phiên bản 18.0.0 trở lên.
+- **PostgreSQL**: Phiên bản 15 trở lên.
 
-Ngoại lệ:
+### 2. Các bước thực hiện
 
-- Sai thông tin đăng nhập
-- Lỗi hệ thống trong quá trình xác thực
-- Có thể khóa tạm thời nếu đăng nhập sai nhiều lần
+**Bước 1: Clone dự án và cài đặt thư viện**
 
-Kết quả: Đăng nhập thành công và truy cập vào trang chủ.
+```bash
+npm install
+```
 
-### 4.3 👤 Thông tin cá nhân
+**Bước 2: Thiết lập cơ sở dữ liệu**
 
-Người dùng đã đăng nhập có thể:
+1. Tạo một database mới trong PostgreSQL (ví dụ: `task_manager`).
+2. Chạy nội dung file `src/database/init.sql` để khởi tạo cấu trúc bảng.
 
-- Xem thông tin cá nhân (họ tên, email, ảnh đại diện, mô tả)
-- Chỉnh sửa thông tin cá nhân
-- Đổi mật khẩu
-- Xem thống kê công việc cá nhân (đã tạo, đang thực hiện, đã hoàn thành, quá hạn)
+**Bước 3: Cấu hình biến môi trường**
+Sao chép `.env.example` thành `.env` và cập nhật thông tin:
 
-### 4.4 📝 Tạo và quản lý công việc
+```env
+PORT=3000
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_NAME=task_manager
+DB_PORT=5432
+JWT_SECRET=your_secret_key
+```
 
-Mỗi công việc gồm các trường:
+**Bước 4: Khởi chạy ứng dụng**
 
-- Tiêu đề
-- Mô tả
-- Ngày bắt đầu
-- Hạn hoàn thành
-- Mức ưu tiên
-- Danh mục
-- Trạng thái
+- Chế độ phát triển (Phát hiện thay đổi file):
+  ```bash
+  npm run dev
+  ```
+- Chế độ Production:
+  ```bash
+  npm start
+  ```
 
-Trạng thái công việc:
+Truy cập: `http://localhost:3000`
 
-- Chưa bắt đầu
-- Đang thực hiện
-- Đã hoàn thành
-- Quá hạn
+---
 
-Hệ thống hỗ trợ:
+## 🔒 Bảo mật dữ liệu
 
-- Thêm công việc
-- Chỉnh sửa công việc
-- Xóa công việc
-- Cập nhật trạng thái công việc
+- Mọi API được bảo vệ bởi middleware xác thực, đảm bảo người dùng chỉ truy cập được dữ liệu của chính mình.
+- Dữ liệu đầu vào được kiểm tra ở cả 2 phía (Frontend & Backend) để ngăn chặn XSS và SQL Injection.
 
-Ràng buộc dữ liệu:
+## 📄 Giấy phép
 
-- Tiêu đề không được để trống
-- Hạn hoàn thành không nhỏ hơn ngày bắt đầu
-- Dữ liệu nhập vào phải hợp lệ
-
-### 4.5 🔄 Cập nhật trạng thái công việc
-
-Người dùng có thể thay đổi trạng thái theo tiến độ thực tế.
-
-Quy tắc bổ sung:
-
-- Nếu chuyển sang trạng thái Đã hoàn thành, hệ thống lưu thời điểm hoàn thành
-- Nếu công việc quá hạn mà chưa hoàn thành, hệ thống có thể tự động đánh dấu Quá hạn
-
-### 4.6 🗂️ Quản lý danh mục công việc
-
-Người dùng có thể tạo, sửa, xóa danh mục để sắp xếp công việc, ví dụ:
-
-- Học tập
-- Cá nhân
-- Công việc
-- Mua sắm
-- Sức khỏe
-
-Ràng buộc:
-
-- Tên danh mục không được trùng
-- Tên danh mục không được để trống
-
-### 4.7 🔎 Tìm kiếm và lọc công việc
-
-Hệ thống cho phép tìm kiếm và lọc theo:
-
-- Từ khóa
-- Trạng thái
-- Mức độ ưu tiên
-- Danh mục
-- Ngày hết hạn
-
-Người dùng có thể kết hợp nhiều bộ lọc đồng thời.
-Chỉ hiển thị công việc thuộc tài khoản hiện tại.
-
-### 4.8 🔔 Thông báo nhắc việc
-
-Hệ thống tạo thông báo cho các công việc:
-
-- Sắp đến hạn
-- Đã quá hạn
-
-Thông báo được hiển thị trong khu vực thông báo của người dùng.
-Người dùng có thể đánh dấu đã đọc.
-Chỉ gửi thông báo cho chủ sở hữu công việc.
-
-### 4.9 📊 Thống kê công việc
-
-Người dùng xem tổng quan:
-
-- Số công việc chưa bắt đầu
-- Số công việc đang thực hiện
-- Số công việc đã hoàn thành
-- Số công việc quá hạn
-
-Hệ thống có thể hiển thị:
-
-- Số liệu tổng hợp theo ngày/tuần/tháng
-- Biểu đồ thống kê
-
-Nếu chưa có dữ liệu, hiển thị trạng thái rỗng hoặc thông báo phù hợp.
-
-### 4.10 🛡️ Quản trị người dùng (Admin)
-
-Quản trị viên có thể:
-
-- Xem danh sách tài khoản người dùng
-- Khóa tài khoản
-- Mở khóa tài khoản
-
-Điều kiện:
-
-- Chỉ tài khoản có quyền admin mới truy cập được chức năng này
-
-## 5. 📚 Tóm tắt use case
-
-### Use case 1: Đăng ký
-
-- Tác nhân: Người dùng
-- Tiền điều kiện: Chưa có tài khoản
-- Hậu điều kiện: Tài khoản mới được tạo
-
-### Use case 2: Đăng nhập
-
-- Tác nhân: Người dùng
-- Tiền điều kiện: Đã có tài khoản
-- Hậu điều kiện: Truy cập thành công vào hệ thống
-
-### Use case 3: Xem/cập nhật thông tin cá nhân
-
-- Tác nhân: Người dùng đã đăng nhập
-- Tiền điều kiện: Đã đăng nhập
-- Hậu điều kiện: Thông tin cá nhân được cập nhật
-
-### Use case 4: Tạo công việc
-
-- Tác nhân: Người dùng đã đăng nhập
-- Tiền điều kiện: Đã đăng nhập
-- Hậu điều kiện: Công việc mới được lưu và hiển thị
-
-### Use case 5: Cập nhật trạng thái công việc
-
-- Tác nhân: Người dùng đã đăng nhập
-- Tiền điều kiện: Đã có công việc
-- Hậu điều kiện: Trạng thái công việc được cập nhật
-
-### Use case 6: Quản lý danh mục
-
-- Tác nhân: Người dùng đã đăng nhập
-- Tiền điều kiện: Đã đăng nhập
-- Hậu điều kiện: Danh mục được tạo/sửa/xóa thành công
-
-### Use case 7: Tìm kiếm và lọc công việc
-
-- Tác nhân: Người dùng
-- Tiền điều kiện: Đã đăng nhập
-- Hậu điều kiện: Danh sách công việc hiển thị đúng tiêu chí
-
-### Use case 8: Nhắc việc
-
-- Tác nhân: Hệ thống và Người dùng
-- Tiền điều kiện: Đã có công việc có hạn
-- Hậu điều kiện: Thông báo được tạo và hiển thị
-
-### Use case 9: Xem thống kê công việc
-
-- Tác nhân: Người dùng
-- Tiền điều kiện: Đã đăng nhập và có dữ liệu
-- Hậu điều kiện: Báo cáo thống kê được hiển thị
-
-### Use case 10: Quản lý người dùng
-
-- Tác nhân: Quản trị viên
-- Tiền điều kiện: Đã đăng nhập với quyền admin
-- Hậu điều kiện: Trạng thái tài khoản người dùng được cập nhật
-
-## 6. 🖥️ Các trang giao diện
-
-- Trang đăng nhập
-- Trang đăng ký
-- Trang chủ
-- Trang danh sách công việc
-- Trang thêm công việc
-- Trang chỉnh sửa công việc
-- Trang chi tiết công việc
-- Trang danh mục công việc
-- Trang thông báo
-- Trang thống kê
-- Trang cá nhân
-- Trang quản trị người dùng
-
-## 7. 🔒 Ràng buộc và bảo mật
-
-- Người dùng chỉ được phép thao tác dữ liệu của chính mình
-- Các chức năng yêu cầu đăng nhập phải được bảo vệ bằng cơ chế xác thực
-- Phân quyền rõ ràng giữa người dùng thường và quản trị viên
-- Kiểm tra dữ liệu đầu vào ở cả frontend và backend
-
-## 8. 🚀 Định hướng triển khai
-
-- Ứng dụng hướng tới kiến trúc tách biệt frontend/backend
-- API REST được xây dựng bằng Express.js
-- Dữ liệu được lưu trữ quan hệ trong PostgreSQL
-- Frontend React + Vite tối ưu trải nghiệm và tốc độ phản hồi
-
-## 9. 🧩 Kết luận
-
-Dự án Web App Quản Lý Công Việc Cá Nhân cung cấp đầy đủ các chức năng cần thiết để người dùng quản lý công việc hiệu quả: từ tạo tài khoản, quản lý công việc, nhắc hạn, thống kê đến quản trị hệ thống. Kiến trúc React + Node.js + Express + PostgreSQL đảm bảo tính linh hoạt, dễ mở rộng và phù hợp cho quá trình phát triển thực tế.
-
-## 10. 📄 Giấy phép
-
-Dự án này được phát hành theo giấy phép **MIT License**.
-
-Bạn được phép:
-
-- Sử dụng cho mục đích cá nhân hoặc thương mại
-- Sao chép, chỉnh sửa, hợp nhất, phát hành và phân phối lại mã nguồn
-- Cấp phép lại hoặc bán phần mềm
-
-Điều kiện bắt buộc:
-
-- Phải giữ nguyên thông báo bản quyền và thông báo giấy phép MIT trong mọi bản sao hoặc phần quan trọng của phần mềm
-
-Miễn trừ trách nhiệm:
-
-- Phần mềm được cung cấp "as is", không có bất kỳ bảo đảm nào
-
-Xem toàn văn giấy phép tại [LICENSE](LICENSE).
+Dự án được phát hành dưới giấy phép **MIT**. Xem chi tiết tại [LICENSE](LICENSE).

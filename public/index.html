@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskFlow — Quản lý công việc cá nhân</title>
+    <meta
+      name="description"
+      content="Ứng dụng web quản lý công việc cá nhân — lập kế hoạch, theo dõi tiến độ, nhắc hạn và thống kê hiệu quả làm việc."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <!-- CSS Modules -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/tasks.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+    <link rel="stylesheet" href="css/landing.css" />
+    <link rel="stylesheet" href="css/datepicker.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+
+  <body>
+    <!-- ===== TRANG CHỦ (CHƯA ĐĂNG NHẬP) ===== -->
+    <div id="trangChu" class="landing-page" style="display: none">
+      <header class="landing-header">
+        <div class="landing-nav">
+          <div class="landing-brand">
+            <span class="brand-icon">📋</span>
+            <span class="brand-name">TaskFlow</span>
+          </div>
+          <div class="landing-nav-actions">
+            <button class="btn-ghost" id="nutDiDangNhap" type="button">
+              Đăng nhập
+            </button>
+            <button class="btn-accent" id="nutDiDangKy" type="button">
+              Đăng ký miễn phí
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section class="hero-section">
+        <div class="hero-content">
+          <div class="hero-badge">✨ Quản lý công việc thông minh</div>
+          <h1 class="hero-title">
+            Sắp xếp cuộc sống.<br /><span class="hero-highlight"
+              >Hoàn thành mục tiêu.</span
+            >
+          </h1>
+          <p class="hero-subtitle">
+            TaskFlow giúp bạn lập kế hoạch, theo dõi tiến độ và hoàn thành công
+            việc hiệu quả hơn mỗi ngày. Đơn giản, trực quan, hoàn toàn miễn phí.
+          </p>
+          <div class="hero-cta">
+            <button class="btn-accent btn-lg" id="nutBatDauNgay" type="button">
+              Bắt đầu ngay →
+            </button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-card-stack">
+            <div class="hero-card card-1">
+              <div class="hc-icon blue-glow">📝</div>
+              <div>
+                <div class="hc-title">Quản lý công việc</div>
+                <div class="hc-desc">
+                  Tạo, sắp xếp và theo dõi mọi công việc
+                </div>
+              </div>
+            </div>
+            <div class="hero-card card-2">
+              <div class="hc-icon green-glow">🔔</div>
+              <div>
+                <div class="hc-title">Nhắc nhở thông minh</div>
+                <div class="hc-desc">
+                  Không bao giờ bỏ lỡ deadline quan trọng
+                </div>
+              </div>
+            </div>
+            <div class="hero-card card-3">
+              <div class="hc-icon purple-glow">📊</div>
+              <div>
+                <div class="hc-title">Thống kê chi tiết</div>
+                <div class="hc-desc">
+                  Đánh giá hiệu suất và cải thiện liên tục
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-section">
+        <h2 class="features-heading">Tất cả những gì bạn cần</h2>
+        <p class="features-sub">
+          Công cụ hoàn chỉnh để quản lý công việc cá nhân hiệu quả
+        </p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🗂️</div>
+            <h3>Danh mục linh hoạt</h3>
+            <p>
+              Phân loại công việc theo danh mục tùy chỉnh: Học tập, Cá nhân,
+              Công việc...
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔎</div>
+            <h3>Tìm kiếm & Lọc</h3>
+            <p>
+              Tìm kiếm nhanh theo từ khóa, trạng thái, mức ưu tiên và danh mục.
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Theo dõi trạng thái</h3>
+            <p>Cập nhật tiến độ: Cần làm → Đang làm → Hoàn thành.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Bảo mật dữ liệu</h3>
+            <p>Mật khẩu được mã hóa, dữ liệu chỉ thuộc về bạn.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="landing-footer">
+        <p>© 2026 TaskFlow — Quản lý công việc cá nhân. MIT License.</p>
+      </footer>
+    </div>
+
+    <!-- ===== TRANG ĐĂNG NHẬP ===== -->
+    <div id="trangDangNhap" class="auth-page" style="display: none">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-logo">📋</div>
+          <h1>Đăng nhập</h1>
+          <p>Quản lý công việc cá nhân hiệu quả</p>
+        </div>
+        <form id="formDangNhap" class="auth-form">
+          <div class="form-group">
+            <label for="dnEmail">Email</label>
+            <input
+              type="email"
+              id="dnEmail"
+              placeholder="email@example.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="dnMatKhau">Mật khẩu</label>
+            <input
+              type="password"
+              id="dnMatKhau"
+              placeholder="Nhập mật khẩu"
+              required
+            />
+          </div>
+          <div id="loiDangNhap" class="error-msg"></div>
+          <button type="submit" class="btn-primary btn-full">Đăng nhập</button>
+        </form>
+        <p class="auth-switch">
+          Chưa có tài khoản? <a href="#" id="nutMoDangKy">Đăng ký ngay</a>
+        </p>
+        <p class="auth-switch">
+          <a href="#" id="nutQuenMatKhau">Quên mật khẩu?</a>
+        </p>
+        <p class="auth-switch">
+          <a href="#" id="nutVeTrangChu">← Quay lại trang chủ</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- ===== TRANG ĐĂNG KÝ ===== -->
+    <div id="trangDangKy" class="auth-page" style="display: none">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-logo">📋</div>
+          <h1>Đăng ký</h1>
+          <p>Tạo tài khoản mới</p>
+        </div>
+        <form id="formDangKy" class="auth-form">
+          <div class="form-group">
+            <label for="dkHoTen">Họ và tên</label>
+            <input
+              type="text"
+              id="dkHoTen"
+              placeholder="Nguyễn Văn A"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="dkEmail">Email</label>
+            <input
+              type="email"
+              id="dkEmail"
+              placeholder="email@example.com"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="dkMatKhau">Mật khẩu</label>
+            <input
+              type="password"
+              id="dkMatKhau"
+              placeholder="Ít nhất 6 ký tự"
+              required
+              minlength="6"
+            />
+            <div
+              id="canhBaoMatKhau"
+              style="
+                color: #f59e0b;
+                font-size: 0.85rem;
+                margin-top: 5px;
+                display: none;
+              "
+            >
+              Mật khẩu yếu, nhưng vẫn cho phép đăng ký.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="dkXacNhan">Xác nhận mật khẩu</label>
+            <input
+              type="password"
+              id="dkXacNhan"
+              placeholder="Nhập lại mật khẩu"
+              required
+            />
+          </div>
+          <div id="loiDangKy" class="error-msg"></div>
+          <button type="submit" class="btn-primary btn-full">Đăng ký</button>
+        </form>
+        <p class="auth-switch">
+          Đã có tài khoản? <a href="#" id="nutMoDangNhap">Đăng nhập</a>
+        </p>
+        <p class="auth-switch">
+          <a href="#" id="nutVeTrangChu2">← Quay lại trang chủ</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- ===== LAYOUT CHÍNH (SAU ĐĂNG NHẬP) ===== -->
+    <div id="layoutChinh" class="app-layout" style="display: none">
+      <!-- Sidebar -->
+      <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">📋</span>
+          <span class="sidebar-title">TaskFlow</span>
+        </div>
+
+        <ul class="sidebar-menu">
+          <li>
+            <button class="menu-item active" data-page="congViec" type="button">
+              📝 Công việc
+            </button>
+          </li>
+          <li>
+            <button class="menu-item" data-page="danhMuc" type="button">
+              🗂️ Danh mục
+            </button>
+          </li>
+          <li>
+            <button class="menu-item" data-page="thongBao" type="button">
+              🔔 Thông báo
+              <span id="badgeThongBao" class="menu-badge" style="display: none"
+                >0</span
+              >
+            </button>
+          </li>
+          <li>
+            <button class="menu-item" data-page="thongKe" type="button">
+              📊 Thống kê
+            </button>
+          </li>
+          <li id="menuAdmin" style="display: none">
+            <button class="menu-item" data-page="quanTri" type="button">
+              🛡️ Quản trị
+            </button>
+          </li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <button
+            class="sidebar-user menu-item"
+            data-page="caNhan"
+            type="button"
+            title="Trang cá nhân"
+          >
+            <div class="avatar-sm" id="avatarSidebar">K</div>
+            <span id="tenNguoiDungSidebar" style="font-weight: 600">User</span>
+          </button>
+          <button class="btn-logout" id="nutDangXuat" type="button">
+            Đăng xuất
+          </button>
+        </div>
+      </nav>
+
+      <!-- Nội dung chính -->
+      <main class="main-content">
+        <!-- ===== TRANG CÔNG VIỆC ===== -->
+        <section id="pageCongViec" class="page">
+          <div class="page-header">
+            <div>
+              <h1>Công việc của tôi</h1>
+            </div>
+            <button class="add-btn" id="openAddModal" type="button">
+              <span>＋</span>
+              <span>Thêm công việc</span>
+            </button>
+          </div>
+
+          <section class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">⌕</span>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Tìm kiếm công việc..."
+              />
+            </div>
+            <div class="view-toggles" id="viewToggles">
+              <button id="btnListView" class="view-btn active" type="button">
+                📝 Danh sách
+              </button>
+              <button id="btnBoardView" class="view-btn" type="button">
+                📋 Bảng Kanban
+              </button>
+            </div>
+            <button class="filter-btn" id="toggleFilterBtn" type="button">
+              <span>☷</span>
+              <span>Bộ lọc</span>
+            </button>
+          </section>
+
+          <section class="filter-panel" id="filterPanel">
+            <div class="field">
+              <label for="statusFilter">Trạng thái</label>
+              <select id="statusFilter">
+                <option value="all">Tất cả</option>
+                <option value="not-started">Cần làm</option>
+                <option value="in-progress">Đang làm</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="overdue">Quá hạn</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="priorityFilter">Mức độ ưu tiên</label>
+              <select id="priorityFilter">
+                <option value="all">Tất cả</option>
+                <option value="low">Thấp</option>
+                <option value="medium">Trung bình</option>
+                <option value="high">Cao</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="categoryFilter">Danh mục</label>
+              <select id="categoryFilter">
+                <option value="all">Tất cả</option>
+              </select>
+            </div>
+            <div class="field field-btn">
+              <button id="resetFilterBtn" type="button">Đặt lại bộ lọc</button>
+            </div>
+          </section>
+
+          <nav class="tabs" id="listTabs">
+            <button class="tab active" data-tab="all" type="button">
+              Tất cả (<span>0</span>)
+            </button>
+            <button class="tab" data-tab="not-started" type="button">
+              Cần làm (<span>0</span>)
+            </button>
+            <button class="tab" data-tab="in-progress" type="button">
+              Đang làm (<span>0</span>)
+            </button>
+            <button class="tab" data-tab="completed" type="button">
+              Hoàn thành (<span>0</span>)
+            </button>
+            <button class="tab" data-tab="overdue" type="button">
+              Quá hạn (<span>0</span>)
+            </button>
+          </nav>
+
+          <!-- View Danh Sách -->
+          <div id="listViewContainer">
+            <div class="quick-add-wrap">
+              <span class="quick-add-icon">＋</span>
+              <input
+                type="text"
+                id="quickTaskInput"
+                placeholder="Thêm công việc nhanh (nhập tên và nhấn Enter)..."
+              />
+            </div>
+            <section class="list" id="taskList"></section>
+            <div class="empty-state" id="emptyState">
+              Không có công việc nào phù hợp.
+            </div>
+          </div>
+
+          <!-- View Kanban Board -->
+          <div id="kanbanBoardContainer" style="display: none">
+            <div class="kanban-board">
+              <div class="kanban-col" data-status="pending">
+                <div class="kanban-col-head">
+                  <span class="k-title">Cần làm</span>
+                  <span class="k-count" id="kCountPending">0</span>
+                </div>
+                <div class="kanban-list" id="kListPending"></div>
+              </div>
+              <div class="kanban-col" data-status="in_progress">
+                <div class="kanban-col-head">
+                  <span class="k-title" style="color: #3b82f6">Đang làm</span>
+                  <span class="k-count" id="kCountInProgress">0</span>
+                </div>
+                <div class="kanban-list" id="kListInProgress"></div>
+              </div>
+              <div class="kanban-col" data-status="completed">
+                <div class="kanban-col-head">
+                  <span class="k-title" style="color: #10b981">Hoàn thành</span>
+                  <span class="k-count" id="kCountCompleted">0</span>
+                </div>
+                <div class="kanban-list" id="kListCompleted"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== TRANG DANH MỤC ===== -->
+        <section id="pageDanhMuc" class="page" style="display: none">
+          <div class="page-header">
+            <h1>Danh mục công việc</h1>
+            <button class="add-btn" id="nutThemDanhMuc" type="button">
+              <span>＋</span>
+              <span>Thêm danh mục</span>
+            </button>
+          </div>
+          <div class="dm-form-wrap" id="formThemDanhMuc" style="display: none">
+            <input
+              type="text"
+              id="tenDanhMucMoi"
+              placeholder="Nhập tên danh mục..."
+              class="dm-input"
+            />
+            <button class="btn-primary" id="nutLuuDanhMuc" type="button">
+              Lưu
+            </button>
+            <button class="btn-secondary" id="nutHuyDanhMuc" type="button">
+              Hủy
+            </button>
+          </div>
+          <div class="dm-list" id="danhSachDanhMuc"></div>
+          <div class="empty-state show" id="rongDanhMuc">
+            Chưa có danh mục nào. Hãy tạo danh mục đầu tiên!
+          </div>
+        </section>
+
+        <!-- ===== TRANG THÔNG BÁO ===== -->
+        <section id="pageThongBao" class="page" style="display: none">
+          <div class="page-header">
+            <h1>Thông báo</h1>
+            <div class="page-actions" style="display: flex; gap: 8px;">
+              <button class="btn-secondary" id="nutDocTatCa" type="button">
+                Đánh dấu tất cả đã đọc
+              </button>
+              <button class="btn-danger" id="nutXoaTatCaThongBao" type="button" title="Xóa toàn bộ lịch sử thông báo của bạn">
+                Xóa tất cả
+              </button>
+            </div>
+          </div>
+          <div class="tb-list" id="danhSachThongBao"></div>
+          <div class="empty-state show" id="rongThongBao">
+            Không có thông báo mới.
+          </div>
+        </section>
+
+        <!-- ===== TRANG THỐNG KÊ ===== -->
+        <section id="pageThongKe" class="page" style="display: none">
+          <div class="page-header">
+            <h1>Thống kê công việc</h1>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card stat-total">
+              <div class="stat-number" id="tkTong">0</div>
+              <div class="stat-label">Tổng công việc</div>
+            </div>
+            <div class="stat-card stat-pending">
+              <div class="stat-number" id="tkChuaBatDau">0</div>
+              <div class="stat-label">Cần làm</div>
+            </div>
+            <div class="stat-card stat-progress">
+              <div class="stat-number" id="tkDangLam">0</div>
+              <div class="stat-label">Đang làm</div>
+            </div>
+            <div class="stat-card stat-done">
+              <div class="stat-number" id="tkHoanThanh">0</div>
+              <div class="stat-label">Hoàn thành</div>
+            </div>
+            <div class="stat-card stat-overdue">
+              <div class="stat-number" id="tkQuaHan">0</div>
+              <div class="stat-label">Quá hạn</div>
+            </div>
+            <div class="stat-card stat-rate">
+              <div class="stat-number" id="tkTiLe">0%</div>
+              <div class="stat-label">Tỉ lệ hoàn thành</div>
+            </div>
+          </div>
+          <div class="chart-section">
+            <h2>Biểu đồ trạng thái</h2>
+            <div class="chart-bars" id="bieuDoThongKe"></div>
+          </div>
+        </section>
+
+        <!-- ===== TRANG CÁ NHÂN ===== -->
+        <section id="pageCaNhan" class="page" style="display: none">
+          <div class="page-header">
+            <h1>Thông tin cá nhân</h1>
+          </div>
+          <div class="profile-grid">
+            <div class="profile-card">
+              <div class="avatar-upload-wrap">
+                <div
+                  class="profile-avatar"
+                  id="avatarCaNhan"
+                  title="Nhấn để đổi ảnh đại diện"
+                >
+                  K
+                </div>
+                <div class="avatar-actions">
+                  <button
+                    type="button"
+                    class="avatar-upload-btn"
+                    id="nutChonAvatar"
+                  >
+                    📷 Đổi ảnh
+                  </button>
+                  <button
+                    type="button"
+                    class="avatar-upload-btn btn-danger"
+                    id="nutXoaAvatar"
+                    style="display: none"
+                  >
+                    🗑 Xóa
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  id="inputAvatar"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  style="display: none"
+                />
+                <div class="avatar-hint">JPG, PNG, GIF, WebP — tối đa 2MB</div>
+              </div>
+              <form id="formCaNhan" class="profile-form">
+                <div class="form-group">
+                  <label for="cnHoTen">Họ và tên</label>
+                  <input type="text" id="cnHoTen" required />
+                </div>
+                <div class="form-group">
+                  <label for="cnEmail">Email</label>
+                  <input type="email" id="cnEmail" disabled />
+                </div>
+                <div class="form-group">
+                  <label for="cnMoTa">Mô tả bản thân</label>
+                  <textarea
+                    id="cnMoTa"
+                    rows="3"
+                    placeholder="Viết gì đó về bản thân..."
+                  ></textarea>
+                </div>
+                <div id="loiCaNhan" class="error-msg"></div>
+                <button type="submit" class="btn-primary">Lưu thay đổi</button>
+              </form>
+            </div>
+
+            <div class="profile-card">
+              <h2>Đổi mật khẩu</h2>
+              <form id="formDoiMatKhau" class="profile-form">
+                <div class="form-group">
+                  <label for="mkHienTai">Mật khẩu hiện tại</label>
+                  <input type="password" id="mkHienTai" required />
+                </div>
+                <div class="form-group">
+                  <label for="mkMoi">Mật khẩu mới</label>
+                  <input type="password" id="mkMoi" required minlength="6" />
+                </div>
+                <div class="form-group">
+                  <label for="mkXacNhan">Xác nhận mật khẩu mới</label>
+                  <input type="password" id="mkXacNhan" required />
+                </div>
+                <div id="loiDoiMK" class="error-msg"></div>
+                <button type="submit" class="btn-primary">Đổi mật khẩu</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== TRANG QUẢN TRỊ (Admin) ===== -->
+        <section id="pageQuanTri" class="page" style="display: none">
+          <div class="page-header">
+            <div>
+              <h1>🛡️ Quản trị người dùng</h1>
+              <p class="admin-subtitle">
+                Quản lý tài khoản, phân quyền và bảo mật hệ thống
+              </p>
+            </div>
+          </div>
+
+          <!-- Thống kê Admin -->
+          <div class="admin-stats" id="adminStats">
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">👥</div>
+              <div class="admin-stat-info">
+                <div class="admin-stat-number" id="adminTotalUsers">0</div>
+                <div class="admin-stat-label">Tổng người dùng</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">✅</div>
+              <div class="admin-stat-info">
+                <div class="admin-stat-number" id="adminActiveUsers">0</div>
+                <div class="admin-stat-label">Đang hoạt động</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">🔒</div>
+              <div class="admin-stat-info">
+                <div class="admin-stat-number" id="adminLockedUsers">0</div>
+                <div class="admin-stat-label">Đã bị khóa</div>
+              </div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-icon">🛡️</div>
+              <div class="admin-stat-info">
+                <div class="admin-stat-number" id="adminAdminCount">0</div>
+                <div class="admin-stat-label">Quản trị viên</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thanh tìm kiếm Admin -->
+          <div class="admin-toolbar">
+            <div class="admin-search-box">
+              <span class="search-icon">⌕</span>
+              <input
+                type="text"
+                id="adminSearchInput"
+                placeholder="Tìm kiếm theo tên hoặc email..."
+              />
+            </div>
+            <div class="admin-filter-group">
+              <select id="adminRoleFilter">
+                <option value="all">Tất cả vai trò</option>
+                <option value="user">Người dùng</option>
+                <option value="admin">Quản trị viên</option>
+              </select>
+              <select id="adminStatusFilter">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="active">Hoạt động</option>
+                <option value="locked">Đã khóa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Người dùng</th>
+                  <th>Email</th>
+                  <th>Vai trò</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày tạo</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="danhSachNguoiDung"></tbody>
+            </table>
+          </div>
+          <div class="empty-state" id="rongQuanTri" style="display: none">
+            Không tìm thấy người dùng nào phù hợp.
+          </div>
+        </section>
+
+        <!-- ===== MODAL CHI TIẾT NGƯỜI DÙNG (Admin) ===== -->
+        <div class="modal-backdrop" id="modalUserDetail">
+          <div class="modal" style="max-width: 480px">
+            <div class="modal-head">
+              <h2>Thông tin người dùng</h2>
+              <button class="close-btn" id="closeUserDetail" type="button">
+                &times;
+              </button>
+            </div>
+            <div class="modal-body" id="userDetailContent"></div>
+            <div class="modal-foot">
+              <button class="btn-secondary" id="closeUserDetail2" type="button">
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ===== MODAL THÊM/SỬA CÔNG VIỆC ===== -->
+    <div class="modal-backdrop" id="modalBackdrop">
+      <div class="modal">
+        <div class="modal-head">
+          <h2 id="modalTitle">Thêm công việc</h2>
+          <button class="close-btn" id="closeModal" type="button">
+            &times;
+          </button>
+        </div>
+        <form id="taskForm">
+          <input type="hidden" id="taskId" />
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="taskTitle">Tên công việc</label>
+              <input
+                type="text"
+                id="taskTitle"
+                placeholder="Nhập tên công việc"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="taskDescription">Mô tả</label>
+              <textarea
+                id="taskDescription"
+                placeholder="Nhập mô tả công việc"
+                maxlength="5000"
+              ></textarea>
+              <small id="descCharCounter" style="display: block; text-align: right; color: #64748b; font-size: 11px; margin-top: 4px;">0/5000 ký tự</small>
+            </div>
+            <div class="form-group">
+              <label for="taskPriority">Mức ưu tiên</label>
+              <select id="taskPriority">
+                <option value="low">Thấp</option>
+                <option value="medium">Trung bình</option>
+                <option value="high">Cao</option>
+              </select>
+            </div>
+            <!-- Trạng thái được tính tự động — hidden inputs lưu giá trị -->
+            <input type="hidden" id="taskStatus" value="pending" />
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bắt đầu <span style="color: #ef4444">*</span></label>
+                <div class="dtp-wrap" id="dtpStartWrap">
+                  <div class="dtp-display" id="dtpStartDisplay" tabindex="0">
+                    <span class="dtp-icon">📅</span>
+                    <span class="dtp-val" id="dtpStartVal"
+                      ><span class="dtp-placeholder">Chưa chọn</span></span
+                    >
+                  </div>
+                  <div class="dtp-panel" id="dtpStartPanel"></div>
+                </div>
+                <input type="hidden" id="taskStartDate" />
+              </div>
+              <div class="form-group">
+                <label
+                  >Hạn hoàn thành <span style="color: #ef4444">*</span></label
+                >
+                <div class="dtp-wrap" id="dtpDueWrap">
+                  <div class="dtp-display" id="dtpDueDisplay" tabindex="0">
+                    <span class="dtp-icon">📅</span>
+                    <span class="dtp-val" id="dtpDueVal"
+                      ><span class="dtp-placeholder">Chưa chọn</span></span
+                    >
+                  </div>
+                  <div class="dtp-panel" id="dtpDuePanel"></div>
+                </div>
+                <input type="hidden" id="taskDueDate" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="taskCategory">Danh mục</label>
+              <select id="taskCategory">
+                <option value=""></option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 8px;
+                  cursor: pointer;
+                  font-weight: normal;
+                  margin-bottom: 8px;
+                "
+              >
+                <input
+                  type="checkbox"
+                  id="enableNotification"
+                  style="width: auto; margin: 0; cursor: pointer"
+                />
+                <b>Thông báo nhắc nhở</b>
+              </label>
+              <div
+                id="customNotificationWrap"
+                style="
+                  display: none;
+                  background: #f9fafb;
+                  padding: 16px;
+                  border-radius: 8px;
+                  border: 1px solid var(--line);
+                  flex-direction: column;
+                  gap: 12px;
+                "
+              >
+                <div id="notificationList" style="display: flex; flex-direction: column; gap: 8px;">
+                  <!-- Các mốc thông báo sẽ được thêm vào đây bằng JS -->
+                </div>
+                <button type="button" id="btnAddNotification" class="btn-secondary btn-sm" style="align-self: flex-start; margin-top: 4px;">
+                  + Thêm mốc thông báo
+                </button>
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn-secondary" id="cancelModal" type="button">
+              Hủy
+            </button>
+            <button class="btn-primary" type="submit">Lưu công việc</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== MODAL SỬA DANH MỤC ===== -->
+    <div class="modal-backdrop" id="modalEditCategory" style="display: none">
+      <div class="modal" style="max-width: 400px">
+        <div class="modal-head">
+          <h2>Sửa tên danh mục</h2>
+          <button class="close-btn" id="closeEditCategoryModal" type="button">
+            &times;
+          </button>
+        </div>
+        <form id="editCategoryForm">
+          <input type="hidden" id="editCategoryId" />
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="editCategoryName">Tên danh mục mới</label>
+              <input type="text" id="editCategoryName" required />
+            </div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn-secondary" id="cancelEditCategory" type="button">
+              Hủy
+            </button>
+            <button class="btn-primary" type="submit">Lưu thay đổi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== MODAL XÓA DANH MỤC ===== -->
+    <div class="modal-backdrop" id="modalDeleteCategory" style="display: none">
+      <div class="modal" style="max-width: 400px">
+        <div class="modal-head">
+          <h2>Xóa danh mục</h2>
+          <button class="close-btn" id="closeDeleteCategoryModal" type="button">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="deleteCategoryMsg">Bạn có chắc chắn muốn xóa danh mục này?</p>
+          <input type="hidden" id="deleteCategoryId" />
+        </div>
+        <div class="modal-foot">
+          <button class="btn-secondary" id="cancelDeleteCategory" type="button">
+            Hủy
+          </button>
+          <button class="btn-danger" id="confirmDeleteCategory" type="button">
+            Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TOAST THÔNG BÁO ===== -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- JS Modules (thứ tự load quan trọng!) -->
+    <script src="js/utils.js"></script>
+    <script src="js/datepicker.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/kanban.js"></script>
+    <script src="js/categories.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

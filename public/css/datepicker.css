@@ -1,0 +1,311 @@
+﻿/* ===== CUSTOM DATE-TIME PICKER ===== */
+.dtp-wrap {
+  position: relative;
+}
+
+.dtp-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #000;
+  min-height: 42px;
+}
+
+.dtp-display:hover,
+.dtp-display.open {
+  border-color: #000;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.dtp-display .dtp-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.dtp-display .dtp-val {
+  flex: 1;
+}
+
+.dtp-display .dtp-placeholder {
+  color: #888;
+}
+
+.dtp-panel {
+  display: none;
+  position: absolute;
+  z-index: 9999;
+  bottom: calc(100% + 4px);
+  top: auto;
+  left: 0;
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 0;
+  padding: 12px;
+  box-shadow: 4px 4px 0 #000;
+  width: 280px;
+}
+
+.dtp-panel.open {
+  display: block;
+}
+
+.dtp-wrap:has(.dtp-panel.open) {
+  z-index: 9999;
+}
+
+/* Tháng điều hướng */
+.dtp-cal-head {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+  align-items: center;
+  column-gap: 4px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.dtp-cal-head .dtp-head-center {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.dtp-sel-month,
+.dtp-sel-year {
+  padding: 4px 6px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #000;
+  box-sizing: border-box;
+}
+
+.dtp-sel-month:hover,
+.dtp-sel-year:hover {
+  background: #f0f0f0;
+}
+
+.dtp-sel-month {
+  width: auto;
+}
+
+.dtp-sel-year {
+  width: auto;
+}
+
+.dtp-nav {
+  background: transparent;
+  border: none;
+  color: #000;
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.dtp-nav:hover {
+  background: #f0f0f0;
+  color: #000;
+}
+
+/* Lưới lịch */
+.dtp-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 20px repeat(6, 28px);
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.dtp-dow {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #666;
+  padding: 4px 0;
+}
+
+.dtp-day, .dtp-empty-cell {
+  text-align: center;
+  padding: 4px 2px;
+  font-size: 0.82rem;
+  color: #000;
+  border: 1px solid transparent;
+  background: #fff;
+}
+
+.dtp-day {
+  cursor: pointer;
+}
+
+.dtp-day:hover:not(:disabled) {
+  background: #f0f0f0;
+  border-color: #000;
+}
+
+.dtp-day.today {
+  font-weight: 700;
+  border-color: #000;
+}
+
+.dtp-day.selected {
+  background: #000 !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.dtp-day.other-month {
+  color: #ccc;
+}
+
+.dtp-day:disabled {
+  color: #ccc !important;
+  cursor: not-allowed !important;
+  text-decoration: line-through;
+}
+
+/* Phần chọn giờ */
+.dtp-time-block {
+  border-top: 1px solid #000;
+  padding-top: 8px;
+  margin-bottom: 8px;
+}
+
+.dtp-time-title {
+  font-size: 0.75rem;
+  color: #555;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.dtp-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dtp-time-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.dtp-time-col-label {
+  font-size: 0.68rem;
+  color: #888;
+  font-weight: 600;
+}
+
+.dtp-panel input.dtp-time-num {
+  width: 56px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0;
+  height: 36px;
+  line-height: 36px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  margin: 0;
+}
+
+.dtp-panel input.dtp-time-num.invalid {
+  border-color: #ef4444 !important;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+.dtp-panel input.dtp-time-num::-webkit-inner-spin-button,
+.dtp-panel input.dtp-time-num::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.dtp-panel input.dtp-time-num:focus {
+  outline: none;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.dtp-time-err {
+  color: #ef4444;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  min-height: 14px;
+  margin-top: 6px;
+}
+
+.dtp-time-sep {
+  color: #000;
+  font-weight: 900;
+  font-size: 1.5rem;
+  user-select: none;
+  padding-top: 14px;
+}
+
+/* Actions */
+.dtp-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.dtp-btn-ok {
+  flex: 1;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  padding: 9px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.dtp-btn-ok:hover {
+  background: #333;
+}
+
+.dtp-btn-clear {
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  padding: 9px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.dtp-btn-clear:hover {
+  background: #f0f0f0;
+}
+
+.dtp-wrap.right-align .dtp-panel {
+  left: auto;
+  right: 0;
+}

@@ -1,0 +1,355 @@
+.task-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.action-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.action-btn {
+  border: 2px solid #000000;
+  background: #ffffff;
+  color: #000000;
+  font-size: 18px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0px #000000;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0px #000000;
+}
+
+.edit-btn:hover {
+  background: var(--blue-bg);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+
+.delete-btn:hover {
+  background: #fff5f5;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.detail-link {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.detail-link:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.task-detail {
+  display: none;
+  margin-top: 14px;
+  margin-left: 38px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.task-detail.show {
+  display: block;
+}
+
+.td-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #cbd5e1;
+}
+
+.td-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.td-lbl {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.td-desc {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.task-detail.show {
+  display: block;
+}
+
+.empty-state {
+  display: none;
+  text-align: center;
+  padding: 36px 16px;
+  color: #777;
+  border: 1px dashed #ddd;
+  border-radius: 14px;
+  background: #fafafa;
+  font-size: 15px;
+}
+
+.empty-state.show {
+  display: block;
+}
+
+/* View Toggles */
+.view-toggles {
+  display: flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 8px;
+  margin: 0 16px;
+}
+
+.view-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-btn.active {
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn:hover:not(.active) {
+  color: #1e293b;
+}
+
+/* Quick Add Wrap */
+.quick-add-wrap {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.quick-add-wrap:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.quick-add-icon {
+  font-size: 1.2rem;
+  color: #3b82f6;
+  font-weight: 700;
+  margin-right: 12px;
+}
+
+#quickTaskInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+  background: transparent;
+}
+
+/* Kanban Board */
+.kanban-board {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  align-items: flex-start;
+}
+
+.kanban-col {
+  flex: 1;
+  min-width: 300px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.kanban-col-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.k-title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #475569;
+}
+
+.k-count {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.kanban-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+  flex: 1;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.kanban-list.drag-over {
+  background: rgba(59, 130, 246, 0.05);
+  border: 2px dashed #3b82f6;
+}
+
+/* Task Checkbox */
+.task-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid #cbd5e1;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  font-size: 14px;
+  margin-right: 12px;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.task-checkbox:hover {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.task-checkbox.checked {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.task-checkbox.checked:hover {
+  background: #059669;
+  border-color: #059669;
+}
+
+/* Dragging styles */
+.task-card {
+  cursor: grab;
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+.task-card.dragging {
+  opacity: 0.5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+}
+
+/* Improved task card layout */
+.task-left {
+  display: flex;
+  align-items: flex-start;
+}
+.task-title {
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+.task-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+.toolbar {
+  flex-wrap: wrap;
+}
+
+/* Custom Scrollbar for Kanban Board */
+.kanban-board::-webkit-scrollbar {
+  height: 8px;
+}
+.kanban-board::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+.kanban-board::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.kanban-board::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Post-Drop Animation */
+@keyframes highlightDrop {
+  0% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.card-just-dropped {
+  animation: highlightDrop 1.5s ease-out;
+}
